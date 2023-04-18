@@ -9,10 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "eslint": "8.36.0",
+    "eslint": "^8.38.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
+    "p5": "^1.6.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "tone": "^14.7.77"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4"
   }
 }
