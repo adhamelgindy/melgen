@@ -7,6 +7,10 @@ export default function Home() {
   // let synth = new Tone.PolySynth().toMaster();
   const [notes, setNotes] = useState('');
   const [midiNotes, setMidiNotes] = useState([]);
+  const [selectedScale, setSelectedScale] = useState(0);
+  const [numNotes, setNumNotes] = useState(4);
+  const [bpm, setBpm] = useState(150);
+
   let root = 52;
   let scale = [
   [0, 2, 4, 5, 7, 9, 11, 12], // 'Major'
@@ -36,9 +40,9 @@ let scaleNames = [
   "Locrian"
 ]
 
-let selectedScale = 0;
+// let selectedScale = 0;
 
-  let numNotes = 4;
+  // let numNotes = 4;
   let melody = [];
 
   let beat;
@@ -51,36 +55,9 @@ let selectedScale = 0;
 
   let bpmSlider;
   let bpmText;
-  let bpm = 150;
+  // let bpm = 150;
 
   let pt = [];
-
-  // const generateMelody = async () => {
-  //   // Define a scale to use for the melody
-  //   const scale = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4']
-
-  //   // Generate a random melody of 8 notes
-  //   const melody = []
-  //   for (let i = 0; i < 8; i++) {
-  //     const note = scale[Math.floor(Math.random() * scale.length)]
-  //     melody.push(note)
-  //   }
-
-  //   // Create a new synth and connect it to the default audio destination
-  //   const synth = new Tone.Synth().toDestination()
-  //   const now = Tone.now()
-
-  //   // Create a new part with the melody and the synth
-  //   const part = new Tone.Sequence((time, note) => {
-  //     synth.triggerAttacke(note, '8n', time)
-  //   }, melody).start()
-
-  //   // Start the audio context
-  //   part.start()
-
-  //   // Set the generated melody in state
-  //   setNotes(melody)
-  // }
 
 
   function translateNotes(melody) {
@@ -145,24 +122,52 @@ setNotes(melodyString)
 }
 
 async function playMelody() {
+  const synth = new Tone.Synth().toDestination();
+  // console.log(midiMelody)
+
+  // const melody = [
+  //   { note: 'C4', duration: '4n' },
+  //   { note: 'E4', duration: '4n' },
+  //   { note: 'G4', duration: '4n' },
+  //   { note: 'B4', duration: '4n' },
+  //   { note: 'A4', duration: '4n' },
+  //   { note: 'G4', duration: '4n' },
+  //   { note: 'E4', duration: '4n' },
+  //   { note: 'C4', duration: '4n' },
+  // ];
+
+  // melody.forEach((note) => {
+  //   synth.triggerAttackRelease(note.note, note.duration);
+  // });
+
   if (Tone.Transport.state == "started") {
     Tone.Transport.stop();
     // playButton.html('play');
   } else {
     Tone.start();
     Tone.Transport.scheduleRepeat(setMelody, '4n');
-    await Tone.Transport.start();
+    Tone.Transport.start();
     // playButton.html('stop');
   }
 }
 
+function chooseScale(event) {
+  // selectScale = scaleNames.indexOf(selectedScale.value());
+  setSelectedScale(event.target.value);
+  //  generateMelody();
+}
+
+function handleBpmChange(event) {
+  setBpm(event.target.value);
+}
 
 
 function setMelody() {
    beat = Tone.Transport.position.split(":")[1];
   const synth = new Tone.Synth().toDestination();
    let midiNote = Tone.Frequency(notes, 'midi');
-  synth.triggerAttackRelease(midiNote, '8n');
+   const now = Tone.now()
+  synth.triggerAttackRelease(midiNote, '8n', now + 0.5);
 }
 
   function generateMelody() {
@@ -175,7 +180,7 @@ function setMelody() {
     for (let i = 0; i < numNotes; i++) {
       // Choose a random integer between 0 and the length of the selected scale array
       // randomNumber = int(random(scale[selectedScale].length));
-      randomNumber = Math.floor(Math.random() * scale[selectedScale].length)
+      randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length)
       // Add the selected note from the scale to the melody array
    
       note = root + scale[selectedScale][randomNumber];
@@ -187,8 +192,53 @@ function setMelody() {
     console.log(melody);
   }
 
+  const handleScaleChange = (event) => {
+    setNumNotes(event.target.value);
+  };
+
   return (
     <div class="melody">
+     <div >
+      <div class="parameters">
+        <div class="dropdown">
+        <select  id="number-dropdown" value={numNotes} onChange={handleScaleChange}>
+         <option value="4">4</option>
+         <option value="6">6</option>
+         <option value="8">8</option>
+         <option value="10">10</option>
+         <option value="12">12</option>
+        </select>
+        </div>
+      </div>
+      <div class="parameters">
+        <div class="dropdown">
+        <select  id="number-dropdown" value={selectedScale} onChange={chooseScale}>
+         <option value="0">Happy</option>
+         <option value="1">Country</option>
+         <option value="2">Sad</option>
+         <option value="3">Rock</option>
+         <option value="4">Jazz</option>
+         <option value="5">Natural</option>
+         <option value="6">Funky</option>
+         <option value="7">Spanish</option>
+         <option value="8">Dreamy</option>
+         <option value="9">Blues</option>
+         <option value="10">Dark</option>
+        </select>
+        </div>
+      </div>
+      <div class="parameters">
+        <div class="dropdown">
+        <select  id="number-dropdown" value={numNotes} onChange={handleScaleChange}>
+         <option value="4">4</option>
+         <option value="6">6</option>
+         <option value="8">8</option>
+         <option value="10">10</option>
+         <option value="12">12</option>
+        </select>
+        </div>
+      </div>
+    </div>
       <button class="round-button" onClick={generateMelody}><Shuffle/></button>
       <p class="melody">{notes}</p>
       
@@ -207,6 +257,17 @@ function setMelody() {
     <div data-note="B#" class="key black"></div>
     <div data-note="B" class="key white"></div>
   </div>
+  <div>
+      <input 
+        type="range" 
+        class="slider"
+        min="60" 
+        max="240" 
+        value={bpm} 
+        onChange={handleBpmChange} 
+      />
+      <p>BPM: {bpm}</p>
+    </div>
     </div>
   )
 }
