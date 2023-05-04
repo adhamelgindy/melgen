@@ -117,39 +117,85 @@ let musicNotes = melody.map(number => {
 })
 musicNotes = [...notes]
 console.log('music Notes',musicNotes);
+setMidiNotes(musicNotes)
 const melodyString = musicNotes.join(' ');
 setNotes(melodyString)
 }
 
-async function playMelody() {
+const playNotes = (notes) => {
   const synth = new Tone.Synth().toDestination();
-  // console.log(midiMelody)
+  let index = 0;
 
-  // const melody = [
-  //   { note: 'C4', duration: '4n' },
-  //   { note: 'E4', duration: '4n' },
-  //   { note: 'G4', duration: '4n' },
-  //   { note: 'B4', duration: '4n' },
-  //   { note: 'A4', duration: '4n' },
-  //   { note: 'G4', duration: '4n' },
-  //   { note: 'E4', duration: '4n' },
-  //   { note: 'C4', duration: '4n' },
-  // ];
+  console.log('midiNotes', midiNotes);
 
-  // melody.forEach((note) => {
-  //   synth.triggerAttackRelease(note.note, note.duration);
-  // });
+ midiNotes.forEach((item, index) => {
+    midiNotes[index] = item + "4";
+  });
+  console.log('melody4', midiNotes);
+  setMidiNotes(midiNotes);
 
-  if (Tone.Transport.state == "started") {
-    Tone.Transport.stop();
-    // playButton.html('play');
-  } else {
-    Tone.start();
-    Tone.Transport.scheduleRepeat(setMelody, '4n');
-    Tone.Transport.start();
-    // playButton.html('stop');
-  }
-}
+  const playNote = () => {
+    synth.triggerAttackRelease(notes[index], "0.5");
+    index++;
+
+    if (index < notes.length) {
+      setTimeout(playNote, 500);
+    }
+  };
+
+  playNote();
+};
+
+// async function playMelody() {
+//   const synth = new Tone.Synth().toDestination();
+//   // console.log(midiMelody)
+
+//   // const melody = [
+//   //   { note: 'C4', duration: '4n' },
+//   //   { note: 'E4', duration: '4n' },
+//   //   { note: 'G4', duration: '4n' },
+//   //   { note: 'B4', duration: '4n' },
+//   //   { note: 'A4', duration: '4n' },
+//   //   { note: 'G4', duration: '4n' },
+//   //   { note: 'E4', duration: '4n' },
+//   //   { note: 'C4', duration: '4n' },
+//   // ];
+
+//   // melody.forEach((note) => {
+//   //   synth.triggerAttackRelease(note.note, note.duration);
+//   // });
+
+//   const AMinorScale = ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4'];
+//   // const addOctaveNumbers = (scale, octaveNumber) => scale.map(note => {
+//   //   const firstOctaveNoteIndex = scale.indexOf('C') !== -1 ? scale.indexOf('C') : scale.indexOf('C#')
+//   //   const noteOctaveNumber = scale.indexOf(note) < firstOctaveNoteIndex ? octaveNumber - 1 : octaveNumber;
+//   //   return `${note}${noteOctaveNumber}`
+//   // });
+//   // const AMinorScaleWithOctave = addOctaveNumbers(AMinorScale, 4);
+//   console.log('notes', midiNotes);
+//   console.log('AMinorScale', AMinorScale);
+//   const now = Tone.now()
+//   let newTime = now
+//   // const AMinorScaleWithOctave = addOctaveNumbers(midiNotes, 0);
+  
+//   AMinorScale.forEach((note) => {
+//     synth.triggerAttackRelease(note, '4n', now + 0.5)
+//     newTime += 0.5;
+//   });
+  
+
+//   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//   if (Tone.Transport.state == "started") {
+//     Tone.Transport.stop();
+//     // playButton.html('play');
+//   } else {
+//     Tone.start();
+//     Tone.Transport.scheduleRepeat(setMelody, '4n');
+//     Tone.Transport.start();
+//     // playButton.html('stop');
+//   }
+// }
 
 function chooseScale(event) {
   // selectScale = scaleNames.indexOf(selectedScale.value());
@@ -242,7 +288,8 @@ function setMelody() {
       <button class="round-button" onClick={generateMelody}><Shuffle/></button>
       <p class="melody">{notes}</p>
       
-      <button onClick={() => playMelody()}></button>
+      {/* <button onClick={() => playMelody()}></button> */}
+      <button onClick={() => playNotes(midiNotes)}></button>
       <div class="piano">
     <div data-note="C" class="key white"></div>
     <div data-note="D#" class="key black"></div>
