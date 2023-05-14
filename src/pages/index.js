@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Shuffle } from '../icons/shuffle'
 import Link from 'next/link';
- import * as Tone from 'tone';
+import * as Tone from 'tone';
 
 export default function Home() {
   // let synth = new Tone.PolySynth().toMaster();
@@ -9,7 +9,8 @@ export default function Home() {
   const [midiNotes, setMidiNotes] = useState([]);
   const [selectedScale, setSelectedScale] = useState(0);
   const [numNotes, setNumNotes] = useState(4);
-  const [bpm, setBpm] = useState(150);
+  const [bpm, setBpm] = useState(360);
+  const [octave, setOctave] = useState(5);
 
   let root = 52;
   let scale = [
@@ -101,13 +102,13 @@ let musicNotes = melody.map(number => {
       notes.push('D');
     break;
     case 63:
-      notes.push('B2');
+      notes.push('B');
       break;
     case 64:
-      notes.push('E2');
+      notes.push('E');
     break;
     case 65:
-      notes.push('F2');
+      notes.push('F');
     break;
         
     default:
@@ -122,28 +123,60 @@ const melodyString = musicNotes.join(' ');
 setNotes(melodyString)
 }
 
+function chooseInstrument() {
+// switch 
+//case:
+// const synth = new Tone.MonoSynth().toDestination();
+// const synth = new Tone.PolySynth().toDestination();
+// const synth = new Tone.MembraneSynth().toDestination();
+// const synth = new Tone.Sampler().toDestination();
+//  const synth = new Tone.DuoSynth().toDestination();
+
+}
+
 const playNotes = (notes) => {
-  const synth = new Tone.Synth().toDestination();
-  let index = 0;
+  // const synth = new Tone.MonoSynth().toDestination();
+   const synth = new Tone.PolySynth().toDestination();
+  // const synth = new Tone.MembraneSynth().toDestination();
+  // const synth = new Tone.Sampler().toDestination();
+  //  const synth = new Tone.DuoSynth().toDestination();
 
-  console.log('midiNotes', midiNotes);
 
- midiNotes.forEach((item, index) => {
-    midiNotes[index] = item + "4";
-  });
-  console.log('melody4', midiNotes);
-  setMidiNotes(midiNotes);
-
-  const playNote = () => {
-    synth.triggerAttackRelease(notes[index], "0.5");
-    index++;
-
-    if (index < notes.length) {
-      setTimeout(playNote, 500);
-    }
-  };
-
-  playNote();
+    let index = 0;
+  
+    console.log('midiNotes', midiNotes);
+  
+    midiNotes.forEach((note, index) => {
+     if(!note.includes(octave)){
+      midiNotes[index] = note + octave;
+     }
+     
+    });
+    console.log('melody4', midiNotes);
+    setMidiNotes(midiNotes);
+  
+    const playNote = () => {
+  
+      // const sampler = new Tone.Sampler({
+      //   // urls: {
+      //   //   A1: "A1.mp3",
+      //   //   A2: "A2.mp3",
+      //   // },
+      //   // baseUrl: "https://tonejs.github.io/audio/casio/",
+      //   onload: () => {
+      //     sampler.triggerAttackRelease(["C1", "E1", "G1", "B1"], 0.5);
+      //   }
+      // }).toDestination();
+      // synth.triggerAttackRelease(notes[index],  "0.1s");
+       synth.triggerAttackRelease(notes[index],  "64n");
+      index++;
+  
+      if (index < notes.length) {
+        setTimeout(playNote, 500);
+        
+      }
+    };
+    playNote();
 };
 
 // async function playMelody() {
@@ -205,16 +238,17 @@ function chooseScale(event) {
 
 function handleBpmChange(event) {
   setBpm(event.target.value);
+  Tone.Transport.bpm.rampTo(bpm, 0.1);
 }
 
 
-function setMelody() {
-   beat = Tone.Transport.position.split(":")[1];
-  const synth = new Tone.Synth().toDestination();
-   let midiNote = Tone.Frequency(notes, 'midi');
-   const now = Tone.now()
-  synth.triggerAttackRelease(midiNote, '8n', now + 0.5);
-}
+// function setMelody() {
+//    beat = Tone.Transport.position.split(":")[1];
+//   const synth = new Tone.Synth().toDestination();
+//    let midiNote = Tone.Frequency(notes, 'midi');
+//    const now = Tone.now()
+//   synth.triggerAttackRelease(midiNote, '8n', now + 0.5);
+// }
 
   function generateMelody() {
     // Check if the melody array is already at the desired length
@@ -225,10 +259,8 @@ function setMelody() {
     // Loop through numNotes times to generate a new melody
     for (let i = 0; i < numNotes; i++) {
       // Choose a random integer between 0 and the length of the selected scale array
-      // randomNumber = int(random(scale[selectedScale].length));
       randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length)
       // Add the selected note from the scale to the melody array
-   
       note = root + scale[selectedScale][randomNumber];
       melody.push(note);
     }
@@ -244,6 +276,8 @@ function setMelody() {
 
   return (
     <div class="melody">
+    <label for="midi-checkbox">MIDI:</label>
+    <input class="slider" type="checkbox" id="midi-checkbox"/>
      <div >
       <div class="parameters">
         <div class="dropdown">
@@ -280,7 +314,6 @@ function setMelody() {
          <option value="6">6</option>
          <option value="8">8</option>
          <option value="10">10</option>
-         <option value="12">12</option>
         </select>
         </div>
       </div>
@@ -289,7 +322,7 @@ function setMelody() {
       <p class="melody">{notes}</p>
       
       {/* <button onClick={() => playMelody()}></button> */}
-      <button onClick={() => playNotes(midiNotes)}></button>
+      <button class="play-button" onClick={() => playNotes(midiNotes)}></button>
       <div class="piano">
     <div data-note="C" class="key white"></div>
     <div data-note="D#" class="key black"></div>
@@ -308,12 +341,12 @@ function setMelody() {
       <input 
         type="range" 
         class="slider"
-        min="60" 
-        max="240" 
+        min="160" 
+        max="480" 
         value={bpm} 
         onChange={handleBpmChange} 
       />
-      <p>BPM: {bpm}</p>
+      <p>BPM: {bpm*0.5}</p>
     </div>
     </div>
   )
