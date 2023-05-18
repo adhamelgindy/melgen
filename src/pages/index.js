@@ -1,16 +1,29 @@
+import React, { useEffect } from 'react';
 import { useState } from 'react'
 import { Shuffle } from '../icons/shuffle'
 import Link from 'next/link';
 import * as Tone from 'tone';
 
 export default function Home() {
-  // let synth = new Tone.PolySynth().toMaster();
   const [notes, setNotes] = useState('');
   const [midiNotes, setMidiNotes] = useState([]);
   const [selectedScale, setSelectedScale] = useState(0);
   const [numNotes, setNumNotes] = useState(4);
   const [bpm, setBpm] = useState(360);
   const [octave, setOctave] = useState(5);
+  const [instrument, setInstrument] = useState("PolySynth");
+  
+  useEffect(() => {
+    let synth = new Tone.PolySynth().toDestination();
+    
+    // Initialize MIDI connection
+    initializeMIDI();
+
+    // Clean up the Tone.js synth when the component is unmounted
+    // return () => {
+    //   // synth.dispose();
+    // };
+  }, []);
 
   let root = 52;
   let scale = [
@@ -123,23 +136,65 @@ const melodyString = musicNotes.join(' ');
 setNotes(melodyString)
 }
 
-function chooseInstrument() {
-// switch 
-//case:
-// const synth = new Tone.MonoSynth().toDestination();
-// const synth = new Tone.PolySynth().toDestination();
-// const synth = new Tone.MembraneSynth().toDestination();
-// const synth = new Tone.Sampler().toDestination();
-//  const synth = new Tone.DuoSynth().toDestination();
 
-}
+const initializeMIDI = async () => {
+  try {
+    const access = await navigator.requestMIDIAccess();
+    const inputs = access.inputs.values();
+    const input = inputs.next().value;
+
+    // Add an event listener to receive MIDI messages
+    input.onmidimessage = (e) => {
+      if (e.data[0] === 144 && e.data[2] !== 0) {
+        // Convert MIDI note number to frequency
+        const frequency = Tone.Midi(e.data[1]).toFrequency();
+
+        // Trigger a Tone.js synth with the received frequency
+        // synth.triggerAttack(frequency);
+        synth.triggerAttackRelease(frequency,  "8n");
+      } else if (e.data[0] === 128 || (e.data[0] === 144 && e.data[2] === 0)) {
+        // Convert MIDI note number to frequency
+        // const frequency = Tone.Midi(e.data[1]).toFrequency();
+
+        // Release the Tone.js synth
+        // synth.triggerRelease(frequency);
+        // synth.triggerAttackRelease(frequency,  "8n");
+      }
+    };
+  } catch (error) {
+    console.log('Web MIDI API is not supported in this browser.');
+  }
+};
 
 const playNotes = (notes) => {
+  console.log('instrument', instrument);
   // const synth = new Tone.MonoSynth().toDestination();
-   const synth = new Tone.PolySynth().toDestination();
+   let synth;
   // const synth = new Tone.MembraneSynth().toDestination();
   // const synth = new Tone.Sampler().toDestination();
   //  const synth = new Tone.DuoSynth().toDestination();
+  switch(instrument) {
+    case 'MonoSynth':
+      setInstrument('MonoSynth')
+      synth = new Tone.MonoSynth().toDestination();
+      break;
+    case 'PolySynth':
+      setInstrument('PolySynth')
+      synth = new Tone.PolySynth().toDestination();
+      break;
+    case 'MembraneSynth':
+      setInstrument('MembraneSynth')
+      synth = new Tone.MembraneSynth().toDestination();
+      break;
+    case 'Sampler':
+      setInstrument('Sampler')
+      synth = new Tone.Sampler().toDestination();
+      break;
+    case 'DuoSynth':
+      setInstrument('DuoSynth')
+      synth = new Tone.DuoSynth().toDestination();
+      break;              
+  }
 
 
     let index = 0;
@@ -157,6 +212,8 @@ const playNotes = (notes) => {
   
     const playNote = () => {
   
+      // const IChord = constructMajorChord(AMinorScale, 4, 'A3'); //lets try that
+
       // const sampler = new Tone.Sampler({
       //   // urls: {
       //   //   A1: "A1.mp3",
@@ -168,7 +225,8 @@ const playNotes = (notes) => {
       //   }
       // }).toDestination();
       // synth.triggerAttackRelease(notes[index],  "0.1s");
-       synth.triggerAttackRelease(notes[index],  "64n");
+      console.log('notes[index]', notes[index]);
+       synth.triggerAttackRelease(notes[index],  "8n");
       index++;
   
       if (index < notes.length) {
@@ -179,56 +237,6 @@ const playNotes = (notes) => {
     playNote();
 };
 
-// async function playMelody() {
-//   const synth = new Tone.Synth().toDestination();
-//   // console.log(midiMelody)
-
-//   // const melody = [
-//   //   { note: 'C4', duration: '4n' },
-//   //   { note: 'E4', duration: '4n' },
-//   //   { note: 'G4', duration: '4n' },
-//   //   { note: 'B4', duration: '4n' },
-//   //   { note: 'A4', duration: '4n' },
-//   //   { note: 'G4', duration: '4n' },
-//   //   { note: 'E4', duration: '4n' },
-//   //   { note: 'C4', duration: '4n' },
-//   // ];
-
-//   // melody.forEach((note) => {
-//   //   synth.triggerAttackRelease(note.note, note.duration);
-//   // });
-
-//   const AMinorScale = ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4'];
-//   // const addOctaveNumbers = (scale, octaveNumber) => scale.map(note => {
-//   //   const firstOctaveNoteIndex = scale.indexOf('C') !== -1 ? scale.indexOf('C') : scale.indexOf('C#')
-//   //   const noteOctaveNumber = scale.indexOf(note) < firstOctaveNoteIndex ? octaveNumber - 1 : octaveNumber;
-//   //   return `${note}${noteOctaveNumber}`
-//   // });
-//   // const AMinorScaleWithOctave = addOctaveNumbers(AMinorScale, 4);
-//   console.log('notes', midiNotes);
-//   console.log('AMinorScale', AMinorScale);
-//   const now = Tone.now()
-//   let newTime = now
-//   // const AMinorScaleWithOctave = addOctaveNumbers(midiNotes, 0);
-  
-//   AMinorScale.forEach((note) => {
-//     synth.triggerAttackRelease(note, '4n', now + 0.5)
-//     newTime += 0.5;
-//   });
-  
-
-//   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//   if (Tone.Transport.state == "started") {
-//     Tone.Transport.stop();
-//     // playButton.html('play');
-//   } else {
-//     Tone.start();
-//     Tone.Transport.scheduleRepeat(setMelody, '4n');
-//     Tone.Transport.start();
-//     // playButton.html('stop');
-//   }
-// }
 
 function chooseScale(event) {
   // selectScale = scaleNames.indexOf(selectedScale.value());
@@ -242,37 +250,59 @@ function handleBpmChange(event) {
 }
 
 
-// function setMelody() {
-//    beat = Tone.Transport.position.split(":")[1];
-//   const synth = new Tone.Synth().toDestination();
-//    let midiNote = Tone.Frequency(notes, 'midi');
-//    const now = Tone.now()
-//   synth.triggerAttackRelease(midiNote, '8n', now + 0.5);
-// }
-
-  function generateMelody() {
-    // Check if the melody array is already at the desired length
-    if (melody.length == numNotes) {
-      // If it is, remove all elements from the array to reset it
-      melody.splice(0, melody.length);
-    }
-    // Loop through numNotes times to generate a new melody
-    for (let i = 0; i < numNotes; i++) {
-      // Choose a random integer between 0 and the length of the selected scale array
-      randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length)
-      // Add the selected note from the scale to the melody array
-      note = root + scale[selectedScale][randomNumber];
-      melody.push(note);
-    }
-    setMidiNotes(melody);
-     translateNotes(melody)
-    // Log the generated melody to the console
-    console.log(melody);
+function generateMelody() {
+  // Check if the melody array is already at the desired length
+  if (melody.length == numNotes) {
+    // If it is, remove all elements from the array to reset it
+    melody.splice(0, melody.length);
   }
+  // Loop through numNotes times to generate a new melody
+  for (let i = 0; i < numNotes; i++) {
+    // Choose a random integer between 0 and the length of the selected scale array
+    randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length)
+    // Add the selected note from the scale to the melody array
+    note = root + scale[selectedScale][randomNumber];
+    melody.push(note);
+    // Add repeating patterns if numNotes is bigger than 4
+    if (numNotes > 5 && melody.length < numNotes) {
+      // Repeat the last 2 or 4 notes with a probability of 30%
+      if (i > 1 && Math.random() < 0.3 && melody.length < numNotes) {
+        let repeatLength = Math.random() < 0.5 ? 2 : 4;
+        let repeatStart = Math.max(0, i - repeatLength);
+        let repeatNotes = melody.slice(repeatStart, i + 1);
+        melody.splice(i + 1, 0, ...repeatNotes);
+        i += repeatNotes.length;
+      }
+      // Repeat a 3-note pattern with a probability of 20%
+      if (i > 2 && Math.random() < 0.2 && melody.length < numNotes) {
+        let patternStart = Math.max(0, i - 2);
+        let patternNotes = melody.slice(patternStart, i + 1);
+        melody.splice(i + 1, 0, ...patternNotes);
+        i += patternNotes.length;
+      }
+    }
+  }
+  // Truncate the melody array if it has more than numNotes elements
+  if (melody.length > numNotes) {
+    melody.splice(numNotes, melody.length - numNotes);
+  }
+  setMidiNotes(melody);
+  translateNotes(melody);
+  // Log the generated melody to the console
+  console.log(melody);
+}
 
   const handleScaleChange = (event) => {
     setNumNotes(event.target.value);
   };
+
+  const handleOctaveChange = (event) => {
+    setOctave(event.target.value);
+  };
+
+  const handleInstrumentChange = (event) => {
+    setInstrument(event.target.value)   
+    }
 
   return (
     <div class="melody">
@@ -290,6 +320,7 @@ function handleBpmChange(event) {
         </select>
         </div>
       </div>
+      <br/>
       <div class="parameters">
         <div class="dropdown">
         <select  id="number-dropdown" value={selectedScale} onChange={chooseScale}>
@@ -309,20 +340,34 @@ function handleBpmChange(event) {
       </div>
       <div class="parameters">
         <div class="dropdown">
-        <select  id="number-dropdown" value={numNotes} onChange={handleScaleChange}>
-         <option value="4">4</option>
-         <option value="6">6</option>
-         <option value="8">8</option>
-         <option value="10">10</option>
+        <select  id="number-dropdown" value={octave} onChange={handleOctaveChange}>
+         <option value="2">low +</option>
+         <option value="3">low</option>
+         <option value="4">medium</option>
+         <option value="5">high</option>
+         <option value="6">high +</option>
         </select>
         </div>
       </div>
     </div>
       <button class="round-button" onClick={generateMelody}><Shuffle/></button>
       <p class="melody">{notes}</p>
-      
+      <div class="parameters">
+        <div class="dropdown">
+        <select  id="number-dropdown" value={instrument} onChange={handleInstrumentChange}>
+         <option value="MonoSynth">MonoSynth</option>
+         <option value="PolySynth">PolySynth</option>
+         <option value="MembraneSynth">MembraneSynth</option>
+         <option value="Sampler">Sampler</option>
+         <option value="DuoSynth">DuoSynth</option>
+        </select>
+        </div>
+      </div>
+      <br/>
       {/* <button onClick={() => playMelody()}></button> */}
       <button class="play-button" onClick={() => playNotes(midiNotes)}></button>
+      <br/>
+      {/* playNotes(["B" ,"C" ,"D", "E", "F" ,"G" ,"A"])} */}
       <div class="piano">
     <div data-note="C" class="key white"></div>
     <div data-note="D#" class="key black"></div>

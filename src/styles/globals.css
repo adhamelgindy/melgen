@@ -4,6 +4,7 @@
 
 body {
   background-color: #22343C;
+  /* background-color: #E9F8FF; */
   margin: 0;
   min-height: 100vh;
   display: flex;
@@ -46,7 +47,7 @@ body {
   -moz-appearance: none;
 }
 
-.dropdown select:focus {
+/* .dropdown select:focus {
   outline: none;
   box-shadow: 0 0 5px #ccc;
 }
@@ -54,7 +55,7 @@ body {
 .dropdown select option {
   background-color: #f2f2f2;
   color: #333;
-}
+} */
 
 .melody {
   color: #009458 ;
@@ -81,6 +82,7 @@ body {
   width: 50px;
   height: 50px;
   background-color: #009458;
+  margin-bottom: 10px;
 }
 
 .key {
@@ -88,10 +90,23 @@ body {
   width: var(--width);
 }
 
+.white:hover {
+  border: 6px solid;
+  /* outline-style: dotted; */
+  outline-color: 009458;
+}
+
+.black:hover {
+  border: 5px solid;
+  /* outline-style: dotted; */
+  outline-color: 009458;
+}
+
 .white {
   --width: 50px;
   background-color: white;
   border: 1px solid #333;
+  border-radius: 6px;
 }
 
 .white.active {
@@ -104,6 +119,8 @@ body {
   margin-left: calc(var(--width) / -2);
   margin-right: calc(var(--width) / -2);
   z-index: 2;
+  border-radius: 10px;
+  margin-top: 1px;
 }
 
 .black.active {
