@@ -3,10 +3,16 @@ import React, {
 } from 'react';
 import {
     useState
-} from 'react'
+} from 'react';
 import {
     Shuffle
-} from '../icons/shuffle'
+} from '../icons/shuffle';
+import {
+    Play
+} from '../icons/play';
+import {
+    Piano
+} from '../icons/piano';
 import Link from 'next/link';
 import * as Tone from 'tone';
 // import A4 from "../samples/A4.mp3";
@@ -23,12 +29,10 @@ export default function Home() {
     const [selectedScale, setSelectedScale] = useState(0);
     const [numNotes, setNumNotes] = useState(4);
     const [bpm, setBpm] = useState(100);
-    const [octave, setOctave] = useState(5);
+    const [octave, setOctave] = useState(4);
     const [instrument, setInstrument] = useState("Sampler");
 
     useEffect(() => {
-
-
         // Initialize MIDI connection
         initializeMIDI();
 
@@ -48,7 +52,7 @@ export default function Home() {
         [0, 2, 3, 5, 7, 9, 11, 12], // 'Melodic Minor'
         [0, 2, 3, 5, 7, 8, 11, 12], // 'Natural Minor'
         [0, 2, 3, 5, 7, 9, 10, 12], // 'Dorian'
-        [0, 1, 3, 5, 7, 8, 10, 12], //'Phrygian' 
+        [0, 1, 3, 5, 7, 8, 10, 12], //'Phrygian'
         [0, 2, 4, 6, 7, 9, 11, 12], // 'Lydian'
         [0, 2, 4, 5, 7, 9, 10, 12], // 'Mixolydian'
         [0, 1, 3, 5, 6, 8, 10, 12], // 'Locrian'
@@ -331,7 +335,7 @@ export default function Home() {
         setMidiNotes(midiNotes);
 
         const playNote = async () => {
-            const rhythm = [1, 1, 0.5, 0.5, 1, 1, 0.5, 0.5];
+            // const rhythm = [1, 1, 0.5, 0.5, 1, 1, 0.5, 0.5];
             // let rhythmIndex = Tone.Transport.position % rhythm.length;
             // const IChord = constructMajorChord(AMinorScale, 4, 'A3'); //lets try that
             console.log('notes[index]', notes[index]);
@@ -348,11 +352,24 @@ export default function Home() {
             } else {
                 if (instrument === "Sampler" || instrument === "Guitar" || instrument === "Saxophone" || instrument === "Flute" || instrument === "Xylophone" || instrument === "Electric") {
                     // setTimeout(playNote, 500);
+                    
                     await Tone.ToneAudioBuffer.loaded().then(() => {
                         // console.log("synth.loaded", synth.loaded);
-                        let time = 5;
-                        synth.triggerAttackRelease(notes[index], "8n")
+
+                        // notes.forEach(note => {
+
+                        //     synth.triggerAttackRelease(note, Math.floor(Math.random() * 8) + 1 + "n");
+                        // })
+                             synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
                     });
+                    // const loop = new Tone.Loop((time) => {
+                    //     Tone.ToneAudioBuffer.loaded().then(() => {
+                        //   synth.triggerAttackRelease(notes[index], "8n");
+                    //     });
+                    //   }, "8n");
+
+                      // Start the loop
+                    //   loop.start();
                     // synth.triggerAttackRelease(notes[index], "8n", Tone.Time(time))
                 } else {
                     synth.triggerAttackRelease(notes[index], "8n");
@@ -379,7 +396,8 @@ export default function Home() {
 
     function handleBpmChange(event) {
         setBpm(event.target.value);
-        Tone.Transport.bpm.rampTo(bpm, 0.1);
+        Tone.Transport.bpm.value = bpm
+        Tone.Transport.bpm.rampTo(bpm, 500);
     }
 
 
@@ -437,23 +455,12 @@ export default function Home() {
         setInstrument(event.target.value)
     }
 
-    
+
   return (
     <div class="melody">
     <label>MIDI:</label>
     <input class="slider" type="checkbox" id="midi-checkbox"/>
      <div >
-      <div class="parameters">
-        <div class="dropdown">
-        <select  id="number-dropdown" value={numNotes} onChange={handleScaleChange}>
-         <option value="4">4</option>
-         <option value="6">6</option>
-         <option value="8">8</option>
-         <option value="10">10</option>
-         <option value="12">12</option>
-        </select>
-        </div>
-      </div>
       <br/>
       <div class="parameters">
         <div class="dropdown">
@@ -485,27 +492,44 @@ export default function Home() {
       </div>
     </div>
       <button class="round-button" onClick={generateMelody}><Shuffle/></button>
+      <br/>
+      <div class="parameters">
+        <div class="dropdown">
+        <select  id="number-dropdown" value={numNotes} onChange={handleScaleChange}>
+         <option value="4">4</option>
+         <option value="6">6</option>
+         <option value="8">8</option>
+         <option value="10">10</option>
+         <option value="12">12</option>
+        </select>
+        </div>
+      </div>
       <p class="melody">{notes}</p>
       <div class="parameters">
         <div class="dropdown">
+        <div className="piano-dropdown" >
+        {/* <Piano/> */}
+      </div>
         <select  id="number-dropdown" value={instrument} onChange={handleInstrumentChange}>
-         <option value="MonoSynth">MonoSynth</option>
-         <option value="Saxophone">Saxophone</option>
-         <option value="PolySynth">PolySynth</option>
-         <option value="MembraneSynth">MembraneSynth</option>
-         <option value="Sampler">Piano</option>
-         <option value="DuoSynth">DuoSynth</option>
-         <option value="Guitar">Guitar</option>
+
+
+
+        <option value="Electric">Electric</option>
          <option value="Flute">Flute</option>
+         <option value="Guitar">Guitar</option>
+         <option value="Sampler">Piano</option>
+         <option value="Saxophone">Saxophone</option>
          <option value="Xylophone">Xylophone</option>
-         <option value="Electric">Electric</option>
+         <option value="MonoSynth">MonoSynth</option>
+         <option value="PolySynth">PolySynth</option>
+         <option value="DuoSynth">DuoSynth</option>
+         <option value="MembraneSynth">MembraneSynth</option>
         </select>
         </div>
       </div>
       <br/>
       {/* <button onClick={() => playMelody()}></button> */}
-      <button class="play-button" disabled={midiNotes.length === 0} onClick={() => playNotes(midiNotes)}></button>
-      <br/>
+      <button className="playButton" hidden={midiNotes.length === 0} onClick={() => playNotes(midiNotes)}><Play/></button>
       {/* playNotes(["B" ,"C" ,"D", "E", "F" ,"G" ,"A"])} */}
       <div class="piano">
     <div data-note="C" class="key white"></div>
@@ -522,13 +546,13 @@ export default function Home() {
     <div data-note="B" class="key white"></div>
   </div>
   <div>
-      <input 
-        type="range" 
+      <input
+        type="range"
         class="slider"
-        min="160" 
-        max="480" 
-        value={bpm} 
-        onChange={handleBpmChange} 
+        min="160"
+        max="480"
+        value={bpm}
+        onChange={handleBpmChange}
       />
       <p>BPM: {bpm*0.5}</p>
     </div>
