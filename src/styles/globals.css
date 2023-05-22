@@ -76,7 +76,7 @@ body {
   margin-bottom: 10px;
   border: 2px solid;
   border-color: #009458;
-  border-radius: 1000px;
+  border-radius: 100%;
 }
 
 .playButton:hover {
@@ -88,7 +88,8 @@ body {
   border-radius: 50%;
   width: 100px;
   height: 100px;
-  background-color: #000000;
+  background-color: transparent;
+  border-color: #009458;
 }
 
 
@@ -106,7 +107,7 @@ body {
 .black:hover {
   border: 5px solid;
   /* outline-style: dotted; */
-  outline-color: 009458;
+  outline-color: #009458;
 }
 
 .white {

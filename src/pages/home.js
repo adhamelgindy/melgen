@@ -13,12 +13,8 @@ import {
 import {
     Piano
 } from '../icons/piano';
-import Link from 'next/link';
 import * as Tone from 'tone';
-// import A4 from "../samples/A4.mp3";
-// import C4 from "../samples/C4.mp3";
-// import Ds4 from "../samples/Ds4.mp3";
-// import Fs4 from "../samples/Fs4.mp3";
+import Keyboard from '../components/keyboard'
 import {
     Sampler
 } from "tone";
@@ -170,16 +166,9 @@ export default function Home() {
                     const frequency = Tone.Midi(e.data[1]).toFrequency();
                     console.log('frequencyy', frequency);
 
-                    // Trigger a Tone.js synth with the received frequency
-                    // synth.triggerAttack(frequency);
                     synth.triggerAttackRelease(frequency, "8n");
                 } else if (e.data[0] === 128 || (e.data[0] === 144 && e.data[2] === 0)) {
-                    // Convert MIDI note number to frequency
-                    // const frequency = Tone.Midi(e.data[1]).toFrequency();
-
-                    // Release the Tone.js synth
-                    // synth.triggerRelease(frequency);
-                    // synth.triggerAttackRelease(frequency,  "8n");
+                  
                 }
             };
         } catch (error) {
@@ -335,56 +324,42 @@ export default function Home() {
         setMidiNotes(midiNotes);
 
         const playNote = async () => {
-            // const rhythm = [1, 1, 0.5, 0.5, 1, 1, 0.5, 0.5];
-            // let rhythmIndex = Tone.Transport.position % rhythm.length;
-            // const IChord = constructMajorChord(AMinorScale, 4, 'A3'); //lets try that
             console.log('notes[index]', notes[index]);
             let loop = false;
             if (loop) {
-                const loopB = new Tone.Loop(time => {
+                new Tone.Loop(time => {
                     synth.triggerAttackRelease(notes[index], "8n", time);
                 }, "4n").start("8n");
                 // the loops start when the Transport is started
-                Tone.Transport.start()
-                // ramp up to 800 bpm over 10 seconds
-                // Tone.Transport.bpm.rampTo(800, 10);
-                Tone.Transport.stop()
+                // Tone.Transport.start() ???????????????????????????????????????????
+                // Tone.Transport.stop()  ???????????????????????????????????????????
             } else {
                 if (instrument === "Sampler" || instrument === "Guitar" || instrument === "Saxophone" || instrument === "Flute" || instrument === "Xylophone" || instrument === "Electric") {
-                    // setTimeout(playNote, 500);
-                    
+
                     await Tone.ToneAudioBuffer.loaded().then(() => {
-                        // console.log("synth.loaded", synth.loaded);
-
-                        // notes.forEach(note => {
-
-                        //     synth.triggerAttackRelease(note, Math.floor(Math.random() * 8) + 1 + "n");
-                        // })
-                             synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
+                        let midiNote = Tone.Frequency(notes[index], 'midi');
+                        console.log('midiNote', midiNote);
+                        // synth.triggerAttackRelease(midiNote, '8n');
+                        synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
                     });
-                    // const loop = new Tone.Loop((time) => {
-                    //     Tone.ToneAudioBuffer.loaded().then(() => {
-                        //   synth.triggerAttackRelease(notes[index], "8n");
-                    //     });
-                    //   }, "8n");
 
-                      // Start the loop
-                    //   loop.start();
-                    // synth.triggerAttackRelease(notes[index], "8n", Tone.Time(time))
                 } else {
                     synth.triggerAttackRelease(notes[index], "8n");
                 }
 
             }
 
-            index++;
+             index++;
 
-            if (index < notes.length) {
-                setTimeout(playNote, 500);
+            // if (index < notes.length) {
+            //     setTimeout(playNote, 500);
 
-            }
+            // }
         };
-        playNote();
+
+            //  Tone.Transport.scheduleRepeat(playNote, '4n');
+            //  Tone.Transport.start();  
+         await playNote();
     };
 
 
@@ -397,7 +372,7 @@ export default function Home() {
     function handleBpmChange(event) {
         setBpm(event.target.value);
         Tone.Transport.bpm.value = bpm
-        Tone.Transport.bpm.rampTo(bpm, 500);
+        Tone.Transport.bpm.rampTo(bpm, 0.00000000001);
     }
 
 
@@ -531,20 +506,7 @@ export default function Home() {
       {/* <button onClick={() => playMelody()}></button> */}
       <button className="playButton" hidden={midiNotes.length === 0} onClick={() => playNotes(midiNotes)}><Play/></button>
       {/* playNotes(["B" ,"C" ,"D", "E", "F" ,"G" ,"A"])} */}
-      <div class="piano">
-    <div data-note="C" class="key white"></div>
-    <div data-note="D#" class="key black"></div>
-    <div data-note="D" class="key white"></div>
-    <div data-note="E#" class="key black"></div>
-    <div data-note="E" class="key white"></div>
-    <div data-note="F" class="key white"></div>
-    <div data-note="G#" class="key black"></div>
-    <div data-note="G" class="key white"></div>
-    <div data-note="A#" class="key black"></div>
-    <div data-note="A" class="key white"></div>
-    <div data-note="B#" class="key black"></div>
-    <div data-note="B" class="key white"></div>
-  </div>
+   
   <div>
       <input
         type="range"
@@ -555,6 +517,7 @@ export default function Home() {
         onChange={handleBpmChange}
       />
       <p>BPM: {bpm*0.5}</p>
+    <Keyboard />
     </div>
     </div>
   )
