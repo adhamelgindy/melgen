@@ -22,21 +22,15 @@ import {
 export default function Home() {
     const [notes, setNotes] = useState('');
     const [midiNotes, setMidiNotes] = useState([]);
-    const [selectedScale, setSelectedScale] = useState(0);
-    const [numNotes, setNumNotes] = useState(4);
-    const [bpm, setBpm] = useState(100);
+    const [selectedScale, setSelectedScale] = useState(4);
+    const [numNotes, setNumNotes] = useState(8);
+    const [bpm, setBpm] = useState(200);
     const [octave, setOctave] = useState(4);
-    const [instrument, setInstrument] = useState("Sampler");
+    const [instrument, setInstrument] = useState("Guitar");
+    const [isChecked, setIsChecked] = useState(false);
 
     useEffect(() => {
-        // Initialize MIDI connection
         initializeMIDI();
-
-
-        // Clean up the Tone.js synth when the component is unmounted
-        // return () => {
-        //   // synth.dispose();
-        // };
     }, []);
 
     let root = 52;
@@ -54,39 +48,9 @@ export default function Home() {
         [0, 1, 3, 5, 6, 8, 10, 12], // 'Locrian'
     ];
 
-    let scaleNames = [
-        "Major",
-        "Major Pentatonic",
-        "Minor",
-        "Minor Pentatonic",
-        "Melodic Minor",
-        "Natural Minor",
-        "Dorian",
-        "Phrygian",
-        "Lydian",
-        "Mixolydian",
-        "Locrian"
-    ]
-
-    // let selectedScale = 0;
-
-    // let numNotes = 4;
     let melody = [];
-
-    let beat;
-
     let randomNumber;
     let note;
-
-    let noteSlider;
-    let noteText;
-
-    //   let bpmSlider;
-    //   let bpmText;
-
-
-    let pt = [];
-
 
     function translateNotes(melody) {
         console.log('originalMelody', melody);
@@ -153,36 +117,34 @@ export default function Home() {
 
 
     const initializeMIDI = async () => {
-        let synth = new Tone.PolySynth().toDestination();
-        try {
-            const access = await navigator.requestMIDIAccess();
-            const inputs = access.inputs.values();
-            const input = inputs.next().value;
-
-            // Add an event listener to receive MIDI messages
-            input.onmidimessage = (e) => {
-                if (e.data[0] === 144 && e.data[2] !== 0) {
-                    // Convert MIDI note number to frequency
-                    const frequency = Tone.Midi(e.data[1]).toFrequency();
-                    console.log('frequencyy', frequency);
-
-                    synth.triggerAttackRelease(frequency, "8n");
-                } else if (e.data[0] === 128 || (e.data[0] === 144 && e.data[2] === 0)) {
-                  
-                }
-            };
-        } catch (error) {
-            console.log('Web MIDI API is not supported in this browser.');
-        }
+        // if(isChecked){
+            let synth = new Tone.PolySynth().toDestination();
+            try {
+                const access = await navigator.requestMIDIAccess();
+                const inputs = access.inputs.values();
+                const input = inputs.next().value;
+    
+                // Add an event listener to receive MIDI messages
+                input.onmidimessage = (e) => {
+                    if (e.data[0] === 144 && e.data[2] !== 0) {
+                        // Convert MIDI note number to frequency
+                        const frequency = Tone.Midi(e.data[1]).toFrequency();
+                        console.log('frequencyy', frequency);
+    
+                        synth.triggerAttackRelease(frequency, "8n");
+                    } else if (e.data[0] === 128 || (e.data[0] === 144 && e.data[2] === 0)) {
+                      
+                    }
+                };
+            } catch (error) {
+                console.log('Web MIDI API is not supported in this browser.');
+            }
+        // }
     };
 
     const playNotes = async (notes) => {
         console.log('instrument', instrument);
-        // const synth = new Tone.MonoSynth().toDestination();
         let synth;
-        // const synth = new Tone.MembraneSynth().toDestination();
-        // const synth = new Tone.Sampler().toDestination();
-        //  const synth = new Tone.DuoSynth().toDestination();
         switch (instrument) {
             case 'MonoSynth':
                 setInstrument('MonoSynth')
@@ -336,37 +298,41 @@ export default function Home() {
             } else {
                 if (instrument === "Sampler" || instrument === "Guitar" || instrument === "Saxophone" || instrument === "Flute" || instrument === "Xylophone" || instrument === "Electric") {
 
-                    await Tone.ToneAudioBuffer.loaded().then(() => {
-                        let midiNote = Tone.Frequency(notes[index], 'midi');
-                        console.log('midiNote', midiNote);
-                        // synth.triggerAttackRelease(midiNote, '8n');
-                        synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
+                    await Tone.ToneAudioBuffer.loaded().then(() => {                      
+                            synth.triggerAttackRelease(notes[index], "4n");                    
+                            // synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");                    
                     });
 
                 } else {
-                    synth.triggerAttackRelease(notes[index], "8n");
+                    synth.triggerAttackRelease(notes[index], "4n");
                 }
 
             }
 
-             index++;
+            index++;
 
-            // if (index < notes.length) {
-            //     setTimeout(playNote, 500);
-
-            // }
+            if (index < notes.length) {
+                console.log('bpm', bpm);
+                console.log('indexxx', index);
+                setTimeout(playNote, mirrorValue(bpm) );
+            }
         };
-
-            //  Tone.Transport.scheduleRepeat(playNote, '4n');
-            //  Tone.Transport.start();  
-         await playNote();
+          await playNote();
     };
+
+    function mirrorValue(value) { 
+        var range = 480 - 160;
+        var mirroredValue = range - (value - 160);
+    console.log('value', value);
+    console.log('Mirroredvalue', mirroredValue);
+        
+        return mirroredValue;
+      }
 
 
     function chooseScale(event) {
-        // selectScale = scaleNames.indexOf(selectedScale.value());
         setSelectedScale(event.target.value);
-        //  generateMelody();
+        // generateMelody();
     }
 
     function handleBpmChange(event) {
@@ -378,7 +344,7 @@ export default function Home() {
 
     function generateMelody() {
         // Check if the melody array is already at the desired length
-        if (melody.length == numNotes) {
+        if (melody.length === numNotes) {
             // If it is, remove all elements from the array to reset it
             melody.splice(0, melody.length);
         }
@@ -419,7 +385,10 @@ export default function Home() {
     }
 
     const handleScaleChange = (event) => {
+        console.log('event.target.value', event.target.value);
         setNumNotes(event.target.value);
+        console.log('numNotes', numNotes);
+         generateMelody();
     };
 
     const handleOctaveChange = (event) => {
@@ -430,11 +399,21 @@ export default function Home() {
         setInstrument(event.target.value)
     }
 
+    const handleMidiCheckbox = (event) => {
+        setIsChecked(event.target.checked);
+      };
+
 
   return (
     <div class="melody">
     <label>MIDI:</label>
-    <input class="slider" type="checkbox" id="midi-checkbox"/>
+    <input
+        className="slider"
+        type="checkbox"
+        id="midi-checkbox"
+        checked={isChecked}
+        onChange={handleMidiCheckbox}
+      />
      <div >
       <br/>
       <div class="parameters">
@@ -474,8 +453,8 @@ export default function Home() {
          <option value="4">4</option>
          <option value="6">6</option>
          <option value="8">8</option>
-         <option value="10">10</option>
          <option value="12">12</option>
+         <option value="16">16</option>
         </select>
         </div>
       </div>
@@ -483,7 +462,6 @@ export default function Home() {
       <div class="parameters">
         <div class="dropdown">
         <div className="piano-dropdown" >
-        {/* <Piano/> */}
       </div>
         <select  id="number-dropdown" value={instrument} onChange={handleInstrumentChange}>
 
@@ -512,12 +490,12 @@ export default function Home() {
         type="range"
         class="slider"
         min="160"
-        max="480"
+        max="360"
         value={bpm}
         onChange={handleBpmChange}
       />
       <p>BPM: {bpm*0.5}</p>
-    <Keyboard />
+    <Keyboard notes={midiNotes}/>
     </div>
     </div>
   )
