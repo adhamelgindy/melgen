@@ -14,7 +14,9 @@ import {
     Piano
 } from '../icons/piano';
 import * as Tone from 'tone';
-import Keyboard from '../components/keyboard'
+import Keyboard from '../components/keyboard';
+import Scale from '../components/scale';
+import Octave from '../components/scale';
 import {
     Sampler
 } from "tone";
@@ -24,7 +26,7 @@ export default function Home() {
     const [midiNotes, setMidiNotes] = useState([]);
     const [selectedScale, setSelectedScale] = useState(4);
     const [numNotes, setNumNotes] = useState(8);
-    const [bpm, setBpm] = useState(200);
+    const [bpm, setBpm] = useState(280);
     const [octave, setOctave] = useState(4);
     const [instrument, setInstrument] = useState("Guitar");
     const [isChecked, setIsChecked] = useState(false);
@@ -343,19 +345,20 @@ export default function Home() {
 
 
     function generateMelody() {
+
         // Check if the melody array is already at the desired length
         if (melody.length === numNotes) {
-            // If it is, remove all elements from the array to reset it
+            // reset
             melody.splice(0, melody.length);
         }
-        // Loop through numNotes times to generate a new melody
+
         for (let i = 0; i < numNotes; i++) {
-            // Choose a random integer between 0 and the length of the selected scale array
+            // Random integer between 0 and the length of array
             randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length)
-            // Add the selected note from the scale to the melody array
+            // Add Scale
             note = root + scale[selectedScale][randomNumber];
             melody.push(note);
-            // Add repeating patterns if numNotes is bigger than 4
+       
             if (numNotes > 5 && melody.length < numNotes) {
                 // Repeat the last 2 or 4 notes with a probability of 30%
                 if (i > 1 && Math.random() < 0.3 && melody.length < numNotes) {
@@ -374,21 +377,17 @@ export default function Home() {
                 }
             }
         }
-        // Truncate the melody array if it has more than numNotes elements
         if (melody.length > numNotes) {
             melody.splice(numNotes, melody.length - numNotes);
         }
         setMidiNotes(melody);
         translateNotes(melody);
-        // Log the generated melody to the console
-        console.log(melody);
     }
 
     const handleScaleChange = (event) => {
-        console.log('event.target.value', event.target.value);
-        setNumNotes(event.target.value);
-        console.log('numNotes', numNotes);
-         generateMelody();
+        const _numNotes = event.target.value
+        setNumNotes(_numNotes);
+        // generateMelody();
     };
 
     const handleOctaveChange = (event) => {
@@ -403,6 +402,10 @@ export default function Home() {
         setIsChecked(event.target.checked);
       };
 
+    //   const handleOctaveChangee = (selectedOctave) => {
+    //     // Do something with the selected octave value
+    //     console.log('Selected octave:', selectedOctave);
+    //   }
 
   return (
     <div class="melody">
@@ -416,23 +419,8 @@ export default function Home() {
       />
      <div >
       <br/>
-      <div class="parameters">
-        <div class="dropdown">
-        <select  id="number-dropdown" value={selectedScale} onChange={chooseScale}>
-         <option value="0">Happy</option>
-         <option value="1">Country</option>
-         <option value="2">Sad</option>
-         <option value="3">Rock</option>
-         <option value="4">Jazz</option>
-         <option value="5">Natural</option>
-         <option value="6">Funky</option>
-         <option value="7">Spanish</option>
-         <option value="8">Dreamy</option>
-         <option value="9">Blues</option>
-         <option value="10">Dark</option>
-        </select>
-        </div>
-      </div>
+      <Scale />
+      {/* <Octave onChange={handleOctaveChangee} /> */}
       <div class="parameters">
         <div class="dropdown">
         <select  id="number-dropdown" value={octave} onChange={handleOctaveChange}>
@@ -464,9 +452,6 @@ export default function Home() {
         <div className="piano-dropdown" >
       </div>
         <select  id="number-dropdown" value={instrument} onChange={handleInstrumentChange}>
-
-
-
         <option value="Electric">Electric</option>
          <option value="Flute">Flute</option>
          <option value="Guitar">Guitar</option>
@@ -484,7 +469,6 @@ export default function Home() {
       {/* <button onClick={() => playMelody()}></button> */}
       <button className="playButton" hidden={midiNotes.length === 0} onClick={() => playNotes(midiNotes)}><Play/></button>
       {/* playNotes(["B" ,"C" ,"D", "E", "F" ,"G" ,"A"])} */}
-   
   <div>
       <input
         type="range"

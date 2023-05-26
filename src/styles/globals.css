@@ -119,6 +119,8 @@ body {
 
 .white.active {
   background-color: #009458;
+  opacity: 85%;
+  color: white;
 }
 
 .black {
@@ -132,5 +134,5 @@ body {
 }
 
 .black.active {
-  background-color: #009458;
+  background-color: #14a36a;
 }
