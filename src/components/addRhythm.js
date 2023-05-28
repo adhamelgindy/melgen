@@ -1,24 +1,25 @@
 function addrhythm(melody) {
+
+  // if note bigger than 12 add more ""
+  
   if (melody.includes("")) return;
-    const newArray = [...melody];
+  const catchyMelody = [...melody];
+
+  // more skips for greater meloy length
+  const emptyElementsCount = Math.floor(Math.random() * catchyMelody.length / 3) + 2;
   
-    // if (newArray.length > 2) {
-      const emptyElementsCount = Math.floor(Math.random() * 2) + 2; 
+  // Add empty elements randomly 
+  for (let i = 0; i < emptyElementsCount; i++) {
+  const randomIndex = Math.floor(Math.random() * catchyMelody.length);
+  catchyMelody.splice(randomIndex, 0, "");
+  }
   
-      // Add empty elements randomly within the array
-      for (let i = 0; i < emptyElementsCount; i++) {
-        const randomIndex = Math.floor(Math.random() * newArray.length); // Generate a random 
-        newArray.splice(randomIndex, 0, "");
-      }
-    // }
+  if (catchyMelody.length > 10) {
+  const randomIndex = Math.floor(Math.random() * (catchyMelody.length - 2)) + 1;
+  catchyMelody.splice(randomIndex, 0, "", ""); // Add 2 empty elements at the random indexS
+  }
   
-    // Check if the array length is bigger than 6
-    if (newArray.length > 6) {
-      const randomIndex = Math.floor(Math.random() * (newArray.length - 1)) + 1; 
-      newArray.splice(randomIndex, 0, "", ""); // Add 2 empty elements at the random index
-    }
-  
-    return newArray;
+  return catchyMelody;
   
 }
 
