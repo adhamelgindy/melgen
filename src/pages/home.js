@@ -132,7 +132,7 @@ export default function Home() {
       melody.splice(melodyLength, melody.length - melodyLength);
     }
     if (prevMelody !== null && melody !== prevMelody) {
-        setPrevMelody(translateMelody(melody));
+        setPrevMelody(melody);
          console.log("prevMelody",translateMelody(prevMelody));
       }
     setMidiNotes(melody);
@@ -202,7 +202,7 @@ export default function Home() {
       <br/>
       <button
         className="playButton"
-        onClick={() => setNotes(prevMelody)}
+        onClick={() => setNotes(translateMelody(prevMelody))}
       >
         rewind
       </button>
