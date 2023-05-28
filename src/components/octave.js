@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function Octave({ onChange }) {
-  const [octave, setOctave] = useState(4);
+  const [octave, setOctave] = useState(3);
 
   function handleOctaveChange(event) {
     const selectedOctave = event.target.value;

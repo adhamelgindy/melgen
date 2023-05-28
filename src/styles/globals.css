@@ -35,16 +35,16 @@ body {
 
 .dropdown select {
   text-align: center;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 7px;
+  margin-bottom: 5px;
   font-size: 15px;
   border: none;
   background-color: #009458;
   color: #ffffff;
   border-radius: 50%;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  /* -webkit-appearance: none;
+  -moz-appearance: none; */
 }
 
 /* .dropdown select:focus {
@@ -74,14 +74,10 @@ body {
   background-color: transparent;
   border: none;
   margin-bottom: 10px;
-  border: 2px solid;
-  border-color: #009458;
-  border-radius: 100%;
 }
 
 .playButton:hover {
   border: none;
-  
 }
 
 .round-button {
@@ -90,6 +86,7 @@ body {
   height: 100px;
   background-color: transparent;
   border-color: #009458;
+  margin-top: 10px;
 }
 
 

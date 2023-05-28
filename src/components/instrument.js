@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function Instrument({ onChange }) {
-  const [instrument, setInstrument] = useState("Sampler");
+  const [instrument, setInstrument] = useState("Electric");
 
   function handleInstrumentChange(event) {
     const selectedInstrument = event.target.value;

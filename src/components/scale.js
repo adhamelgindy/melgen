@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function Scale({ onChange }) {
-  const [scale, setScale] = useState(4);
+  const [scale, setScale] = useState(5);
 
   function handleScaleChange(event) {
     const selectedScale = event.target.value;

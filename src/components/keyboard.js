@@ -14,7 +14,7 @@ export default function Keyboard({ notes }) {
       const note = key.dataset.note;
       if (notesString) {
         const translatedMelody = translateMelody(notesString);
-        if (translatedMelody.includes(note)) {
+        if (translatedMelody?.includes(note)) {
           key.classList.add("active");
         } else {
           key.classList.remove("active");

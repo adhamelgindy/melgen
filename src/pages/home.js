@@ -18,11 +18,11 @@ import { Sampler } from "tone";
 export default function Home() {
   const [notes, setNotes] = useState("");
   const [midiNotes, setMidiNotes] = useState([]);
-  const [selectedScale, setSelectedScale] = useState(4);
+  const [selectedScale, setSelectedScale] = useState(5);
   const [melodyLength, setMelodyLength] = useState(8);
   const [bpm, setBpm] = useState(280);
-  const [octave, setOctave] = useState(4);
-  const [instrument, setInstrument] = useState("Sampler");
+  const [octave, setOctave] = useState(3);
+  const [instrument, setInstrument] = useState("Electric");
   const [isChecked, setIsChecked] = useState(false);
   const [prevMelody, setPrevMelody] = useState([]);
 
@@ -63,29 +63,28 @@ export default function Home() {
         midiNotes[index] = note + octave;
       }
     });
-
+  
     console.log("melody4", midiNotes);
     setMidiNotes(midiNotes);
-
+  
     const playNote = async () => {
-      
-      //     new Tone.Loop(time => {
-      //         synth.triggerAttackRelease(notes[index], "8n", time);
-      //     }, "4n").start("8n");
       await Tone.ToneAudioBuffer.loaded().then(() => {
-
         synth.then((instrument) => {
           instrument.triggerAttackRelease(notes[index], "6n");
-          // synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
         });
       });
       index++;
-      if (index < notes.length) {
-        setTimeout(playNote, mirrorValue(bpm));
+      if (index >= notes.length) {
+        index = 0; // Reset index to replay from the beginning
       }
     };
-    await playNote();
+  
+    for(let i = 0; i < 30; i++) {
+       await playNote();
+       await new Promise((playAgain) => setTimeout(playAgain, mirrorValue(bpm)));
+    }
   };
+  
 
   function mirrorValue(value) {
     var range = 480 - 160;
@@ -134,7 +133,7 @@ export default function Home() {
     }
     if (prevMelody !== null && melody !== prevMelody) {
         setPrevMelody(melody);
-         console.log("prevMelody",translateMelody(prevMelody));
+        //  console.log("prevMelody",translateMelody(prevMelody));
       }
 
       
@@ -187,28 +186,20 @@ export default function Home() {
       <br/>
         <Scale onChange={handleScaleChange} />
         <Octave onChange={handleOctaveChange} />
-      <button class="round-button" onClick={generateMelody}>
-        <Shuffle />
-      </button>
+      
       <br />
       <MelodyLength onChange={handleMelodyLengthChange} />
       <p class="melody">{notes}</p>
       <Instrument onChange={handleInstrumentChange} />
       <br />
-      <button
-        className="playButton"
-        hidden={midiNotes.length === 0}
-        onClick={() => playNotes(midiNotes)}
-      >
-        <Play />
-      </button>
-      <br/>
-      <button
+      
+      {/* <br/> */}
+      {/* <button
         className="playButton"
         onClick={() => setNotes(translateMelody(prevMelody))}
       >
         rewind
-      </button>
+      </button> */}
       <div>
         <input
           type="range"
@@ -218,8 +209,25 @@ export default function Home() {
           value={bpm}
           onChange={handleBpmChange}
         />
-        <p>BPM: {bpm * 0.5}</p>
+        {/* <p>BPM: {bpm * 0.5}</p> */}
         <Keyboard notes={midiNotes} />
+        <button
+        className="playButton"
+        hidden={midiNotes.length === 0}
+        onClick={() => playNotes(midiNotes)}
+      >
+        <Play />
+      </button>
+        <button class="round-button" onClick={generateMelody}>
+        <Shuffle />
+      </button>
+      <button
+        className="playButton"
+        hidden={midiNotes.length === 0}
+        onClick={() => playNotes(midiNotes)}
+      >
+        <Play />
+      </button>
       </div>
     </div>
   );
