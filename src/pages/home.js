@@ -58,7 +58,7 @@ export default function Home() {
     const synth = loadInstrument(instrument);
     let index = 0;
     const translatedMidiNotes = translateMelody(midiNotes);
-    translatedMidiNotes.forEach((note, index) => {
+    translatedMidiNotes?.forEach((note, index) => {
       if (!note.includes(octave)) {
         midiNotes[index] = note + octave;
       }
@@ -68,11 +68,12 @@ export default function Home() {
     setMidiNotes(midiNotes);
 
     const playNote = async () => {
-      console.log("notes[index]", notes[index]);
+      
       //     new Tone.Loop(time => {
       //         synth.triggerAttackRelease(notes[index], "8n", time);
       //     }, "4n").start("8n");
       await Tone.ToneAudioBuffer.loaded().then(() => {
+
         synth.then((instrument) => {
           instrument.triggerAttackRelease(notes[index], "6n");
           // synth.triggerAttackRelease(notes[index], Math.floor(Math.random() * 8) + 1 + "n");
@@ -135,7 +136,9 @@ export default function Home() {
         setPrevMelody(melody);
          console.log("prevMelody",translateMelody(prevMelody));
       }
-    setMidiNotes(melody);
+
+      
+        setMidiNotes(melody);
     setNotes(translateMelody(melody).join(" "));
   }
 

@@ -1,3 +1,5 @@
+import addrhythm from "./addRhythm";
+
 function translateMelody(melody) {
   // console.log('originalMelody', melody);
   const notes = [];
@@ -52,12 +54,15 @@ function translateMelody(melody) {
         notes.push("F#");
         break;
       default:
+        notes.push("");
         break;
     }
   });
 
   const musicNotes = [...notes];
-  return musicNotes;
+
+  addrhythm(musicNotes)
+  return addrhythm(musicNotes);
 }
 
 export default translateMelody;
