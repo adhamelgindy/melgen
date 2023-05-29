@@ -25,7 +25,7 @@ export default function Home() {
   const [instrument, setInstrument] = useState("Sampler");
   const [isChecked, setIsChecked] = useState(false);
   const [prevMelody, setPrevMelody] = useState([]);
-  const [isButtonDisabled, setButtonDisabled] = useState(false);
+  // const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
     connectMidi(instrument);
@@ -56,9 +56,9 @@ export default function Home() {
   //#########################################//
 
   const playNotes = async (notes) => {
-    if (isButtonDisabled) {
-      return; 
-    }
+    // if (isButtonDisabled) {
+    //   return; 
+    // }
     if (Tone.Transport.state === "stopped") {
       Tone.Transport.stop();
     } 
@@ -82,10 +82,10 @@ export default function Home() {
         });
       });
       index++;
-      setButtonDisabled(true);
-    setTimeout(() => {
-      setButtonDisabled(false);
-    }, 4000);
+      // setButtonDisabled(true);
+    // setTimeout(() => {
+    //   setButtonDisabled(false);
+    // }, 4000);
       if (index >= notes.length) {
         index = 0; // Reset index to replay from the beginning
       }
@@ -210,7 +210,7 @@ export default function Home() {
         className="playButton"
         hidden={midiNotes.length === 0}
         onClick={() => playNotes(midiNotes)}
-        disabled={isButtonDisabled}
+        // disabled={isButtonDisabled}
       >
         <Play />
       </button>
