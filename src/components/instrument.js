@@ -24,10 +24,10 @@ export default function Instrument({ onChange }) {
           <option value="Sampler">Piano</option>
           <option value="Saxophone">Saxophone</option>
           {/* <option value="Xylophone">Xylophone</option> */}
-          <option value="MonoSynth">MonoSynth</option>
+          {/* <option value="MonoSynth">MonoSynth</option>
           <option value="PolySynth">PolySynth</option>
           <option value="DuoSynth">DuoSynth</option>
-          <option value="MembraneSynth">MembraneSynth</option>
+          <option value="MembraneSynth">MembraneSynth</option> */}
         </select>
       </div>
     </div>
