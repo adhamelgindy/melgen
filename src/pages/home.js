@@ -21,10 +21,11 @@ export default function Home() {
   const [selectedScale, setSelectedScale] = useState(5);
   const [melodyLength, setMelodyLength] = useState(8);
   const [bpm, setBpm] = useState(280);
-  const [octave, setOctave] = useState(3);
-  const [instrument, setInstrument] = useState("Electric");
+  const [octave, setOctave] = useState(4);
+  const [instrument, setInstrument] = useState("Sampler");
   const [isChecked, setIsChecked] = useState(false);
   const [prevMelody, setPrevMelody] = useState([]);
+  const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
     connectMidi(instrument);
@@ -55,6 +56,12 @@ export default function Home() {
   //#########################################//
 
   const playNotes = async (notes) => {
+    if (isButtonDisabled) {
+      return; 
+    }
+    if (Tone.Transport.state === "stopped") {
+      Tone.Transport.stop();
+    } 
     const synth = loadInstrument(instrument);
     let index = 0;
     const translatedMidiNotes = translateMelody(midiNotes);
@@ -71,9 +78,14 @@ export default function Home() {
       await Tone.ToneAudioBuffer.loaded().then(() => {
         synth.then((instrument) => {
           instrument.triggerAttackRelease(notes[index], "6n");
+          console.log('Tone.Transport.state', Tone.Transport.state);
         });
       });
       index++;
+      setButtonDisabled(true);
+    setTimeout(() => {
+      setButtonDisabled(false);
+    }, 4000);
       if (index >= notes.length) {
         index = 0; // Reset index to replay from the beginning
       }
@@ -192,41 +204,18 @@ export default function Home() {
       <p class="melody">{notes}</p>
       <Instrument onChange={handleInstrumentChange} />
       <br />
-      
-      {/* <br/> */}
-      {/* <button
-        className="playButton"
-        onClick={() => setNotes(translateMelody(prevMelody))}
-      >
-        rewind
-      </button> */}
       <div>
-        <input
-          type="range"
-          class="slider"
-          min="160"
-          max="360"
-          value={bpm}
-          onChange={handleBpmChange}
-        />
-        {/* <p>BPM: {bpm * 0.5}</p> */}
         <Keyboard notes={midiNotes} />
         <button
         className="playButton"
         hidden={midiNotes.length === 0}
         onClick={() => playNotes(midiNotes)}
+        disabled={isButtonDisabled}
       >
         <Play />
       </button>
         <button class="round-button" onClick={generateMelody}>
         <Shuffle />
-      </button>
-      <button
-        className="playButton"
-        hidden={midiNotes.length === 0}
-        onClick={() => playNotes(midiNotes)}
-      >
-        <Play />
       </button>
       </div>
     </div>

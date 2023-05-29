@@ -76,6 +76,10 @@ body {
   margin-bottom: 10px;
 }
 
+.playButton:disabled {
+  opacity: 50%;
+}
+
 .playButton:hover {
   border: none;
 }
