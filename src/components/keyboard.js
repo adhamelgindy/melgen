@@ -3,9 +3,10 @@ import translateMelody from "./translateMelody";
 import loadInstrument from "./loadInstrument";
 import * as Tone from "tone";
 
-export default function Keyboard({ notes }) {
+export default function Keyboard({ notes, instrument, octave }) {
+  // console.log('instrumentinstrumentinstrumentinstrument', instrument);
   const [notesString, setNotesString] = useState("");
-  const instrument = loadInstrument("Sampler");
+  const synth = loadInstrument(instrument);
 
   useEffect(() => {
     setNotesString(notes);
@@ -29,8 +30,8 @@ export default function Keyboard({ notes }) {
   const handleKeyDown = async (note) => {
     if (instrument) {
       await Tone.ToneAudioBuffer.loaded().then(() => {
-        instrument.then((synth) => {
-          synth.triggerAttackRelease(note, "4n");
+        synth.then((key) => {
+          key.triggerAttackRelease(note, "4n");
         });
       });
       // instrument.triggerAttack(note);
@@ -40,8 +41,8 @@ export default function Keyboard({ notes }) {
   const handleKeyUp = async (note) => {
     if (instrument) {
       await Tone.ToneAudioBuffer.loaded().then(() => {
-        instrument.then((synth) => {
-          synth.triggerRelease(note, "4n");
+        synth.then((key) => {
+          key.triggerRelease(note, "4n");
         });
       });
       // instrument.triggerRelease(note);
@@ -54,86 +55,86 @@ export default function Keyboard({ notes }) {
         <div
           data-note="C"
           className="key white"
-          onMouseDown={() => handleKeyDown("C4")}
-          onMouseUp={() => handleKeyUp("C4")}
+          onMouseDown={() => handleKeyDown("C" + octave)}
+          onMouseUp={() => handleKeyUp("C" + octave)}
         >
           C
         </div>
         <div
           data-note="C#"
           className="key black"
-          onMouseDown={() => handleKeyDown("C#4")}
-          onMouseUp={() => handleKeyUp("C#4")}
+          onMouseDown={() => handleKeyDown("C#" + octave)}
+          onMouseUp={() => handleKeyUp("C#" + octave)}
         ></div>
         <div
           data-note="D"
           className="key white"
-          onMouseDown={() => handleKeyDown("D4")}
-          onMouseUp={() => handleKeyUp("D4")}
+          onMouseDown={() => handleKeyDown("D" + octave)}
+          onMouseUp={() => handleKeyUp("D" + octave)}
         >
           D
         </div>
         <div
           data-note="D#"
           className="key black"
-          onMouseDown={() => handleKeyDown("D#4")}
-          onMouseUp={() => handleKeyUp("D#4")}
+          onMouseDown={() => handleKeyDown("D#" + octave)}
+          onMouseUp={() => handleKeyUp("D#" + octave)}
         ></div>
         <div
           data-note="E"
           className="key white"
-          onMouseDown={() => handleKeyDown("E4")}
-          onMouseUp={() => handleKeyUp("E4")}
+          onMouseDown={() => handleKeyDown("E" + octave)}
+          onMouseUp={() => handleKeyUp("E" + octave)}
         >
           E
         </div>
         <div
           data-note="F"
           className="key white"
-          onMouseDown={() => handleKeyDown("F#4")}
-          onMouseUp={() => handleKeyUp("F#4")}
+          onMouseDown={() => handleKeyDown("F" + octave)}
+          onMouseUp={() => handleKeyUp("F" + octave)}
         >
           F
         </div>
         <div
           data-note="F#"
           className="key black"
-          onMouseDown={() => handleKeyDown("F#4")}
-          onMouseUp={() => handleKeyUp("F#4")}
+          onMouseDown={() => handleKeyDown("F#" + octave)}
+          onMouseUp={() => handleKeyUp("F#" + octave)}
         ></div>
         <div
           data-note="G"
           className="key white"
-          onMouseDown={() => handleKeyDown("G4")}
-          onMouseUp={() => handleKeyUp("G4")}
+          onMouseDown={() => handleKeyDown("G" + octave)}
+          onMouseUp={() => handleKeyUp("G" + octave)}
         >
           G
         </div>
         <div
           data-note="G#"
           className="key black"
-          onMouseDown={() => handleKeyDown("G#4")}
-          onMouseUp={() => handleKeyUp("G#4")}
+          onMouseDown={() => handleKeyDown("G#" + octave)}
+          onMouseUp={() => handleKeyUp("G#" + octave)}
         ></div>
         <div
           data-note="A"
           className="key white"
-          onMouseDown={() => handleKeyDown("A4")}
-          onMouseUp={() => handleKeyUp("A4")}
+          onMouseDown={() => handleKeyDown("A" + octave)}
+          onMouseUp={() => handleKeyUp("A" + octave)}
         >
           A
         </div>
         <div
           data-note="A#"
           className="key black"
-          onMouseDown={() => handleKeyDown("A#4")}
-          onMouseUp={() => handleKeyUp("A#4")}
+          onMouseDown={() => handleKeyDown("A#" + octave)}
+          onMouseUp={() => handleKeyUp("A#" + octave)}
         ></div>
         <div
           data-note="B"
           className="key white"
-          onMouseDown={() => handleKeyDown("B4")}
-          onMouseUp={() => handleKeyUp("B4")}
+          onMouseDown={() => handleKeyDown("B" + octave)}
+          onMouseUp={() => handleKeyUp("B" + octave)}
         >
           B
         </div>

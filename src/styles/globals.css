@@ -6,7 +6,7 @@ body {
   background-color: #22343C;
   /* background-color: #E9F8FF; */
   margin: 0;
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,39 +23,29 @@ body {
 }
 
 .parameters {
-  display: inline-block;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
+  display:inline-block;
+  margin: 2px;
 }
 
-/* .dropdown {
-  margin-right: 10px;
-} */
+.rootNote {
+  /* justify-content: center;
+  align-items: center; */
+}
 
 .dropdown select {
-  text-align: center;
-  padding: 7px;
-  margin-bottom: 5px;
-  font-size: 15px;
-  border: none;
+  border-radius: 10%;
+  border-color: #009458;
+  width: 70px;
+  height: 30px;
+  background-color: transparent;
+  color: #009458;
+}
+
+.dropdown option {
   background-color: #009458;
   color: #ffffff;
-  border-radius: 50%;
-  appearance: none;
-  /* -webkit-appearance: none;
-  -moz-appearance: none; */
 }
 
-/* .dropdown select:focus {
-  outline: none;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.dropdown select option {
-  background-color: #f2f2f2;
-  color: #333;
-} */
 
 .melody {
   color: #009458 ;
@@ -93,22 +83,35 @@ body {
   margin-top: 10px;
 }
 
-
-.key {
-  height: calc(var(--width) * 4);
-  width: var(--width);
+.menuButton {
+  border-radius: 10%;
+  width: 60px;
+  height: 50px;
+  background-color: transparent;
+  margin: 10px;
+  color: #ffffff;
 }
 
-.white:hover {
-  border: 6px solid;
-  /* outline-style: dotted; */
-  outline-color: #009458;
+.menuOptions {
+  display:flex;
+  justify-content: auto;
+  align-items: auto;
 }
 
-.black:hover {
-  border: 5px solid;
-  /* outline-style: dotted; */
-  outline-color: #009458;
+
+.rewindButton {
+  margin-right: 10px;
+  border: none;
+  background-color: transparent;
+}
+
+  /*************/
+ /* keyboard */
+/***********/
+
+.piano {
+  justify-content: center;
+  align-items: center;
 }
 
 .white {
@@ -137,4 +140,21 @@ body {
 .black.active {
   background-color: #14a36a;
   color: black;
+}
+
+.white:hover {
+  border: 6px solid;
+  /* outline-style: dotted; */
+  outline-color: #009458;
+}
+
+.black:hover {
+  border: 5px solid;
+  /* outline-style: dotted; */
+  outline-color: #14a36a;
+}
+
+.key {
+  height: calc(var(--width) * 4);
+  width: var(--width);
 }

@@ -10,7 +10,7 @@ export default function Octave({ onChange }) {
   }
 
   return (
-    // <div className="parameters">
+    <div className="parameters">
     <div className="dropdown">
       <select id="number-dropdown" value={octave} onChange={handleOctaveChange}>
         <option value="2">low +</option>
@@ -20,6 +20,6 @@ export default function Octave({ onChange }) {
         <option value="6">high +</option>
       </select>
     </div>
-    // </div>
+     </div>
   );
 }

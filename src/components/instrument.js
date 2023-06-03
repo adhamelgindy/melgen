@@ -6,13 +6,12 @@ export default function Instrument({ onChange }) {
   function handleInstrumentChange(event) {
     const selectedInstrument = event.target.value;
     setInstrument(selectedInstrument);
-    onChange(selectedInstrument); // Call the onChange prop with the selected value
+    onChange(selectedInstrument); 
   }
 
   return (
     <div class="parameters">
       <div class="dropdown">
-        <div className="piano-dropdown"></div>
         <select
           id="number-dropdown"
           value={instrument}

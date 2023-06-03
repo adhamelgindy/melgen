@@ -2,29 +2,36 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { Shuffle } from "../icons/shuffle";
 import { Play } from "../icons/play";
+import { Reverse } from "../icons/reverse";
+import { Edit } from "../icons/edit";
 import * as Tone from "tone";
 import Keyboard from "../components/keyboard";
 import Scale from "../components/scale";
+import RootNote from "../components/rootNote";
 import Octave from "../components/octave";
+import Cycles from "../components/cycles";
 import MelodyLength from "../components/melodyLength";
 import translateMelody from "../components/translateMelody";
 import connectMidi from "../components/connectMidi";
 import loadInstrument from "../components/loadInstrument";
 import Instrument from "../components/instrument";
-import generateMelodyy from "../components/generateMelody";
-import { Piano } from "../icons/piano";
-import { Sampler } from "tone";
+// import generateMelodyy from "../components/generateMelody";
+// import { Piano } from "../icons/piano";
+// import { Sampler } from "tone";
 
 export default function Home() {
   const [notes, setNotes] = useState("");
   const [midiNotes, setMidiNotes] = useState([]);
   const [selectedScale, setSelectedScale] = useState(5);
   const [melodyLength, setMelodyLength] = useState(8);
+  const [rootNote, setRootNote] = useState(48);
   const [bpm, setBpm] = useState(280);
+  const [cycles, setcycles] = useState(3);
   const [octave, setOctave] = useState(4);
   const [instrument, setInstrument] = useState("Sampler");
   const [isChecked, setIsChecked] = useState(false);
   const [prevMelody, setPrevMelody] = useState([]);
+  const [showDropdowns, setShowDropdowns] = useState(false);
   // const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
@@ -32,12 +39,12 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let root = 52;
+  // let root = rootNote;
   let scale = [
     [0, 2, 4, 5, 7, 9, 11, 12], // 'Major'
-    [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24], // 'Major Pentatonic
+    [0, 2, 4, 7, 9], // 'Major Pentatonic'
     [0, 2, 3, 5, 7, 8, 10, 12], // 'Minor'
-    [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24], // 'Minor Pentatonic'
+    [0, 3, 5, 7, 10], // 'Minor Pentatonic'
     [0, 2, 3, 5, 7, 9, 11, 12], // 'Melodic Minor'
     [0, 2, 3, 5, 7, 8, 11, 12], // 'Natural Minor'
     [0, 2, 3, 5, 7, 9, 10, 12], // 'Dorian'
@@ -52,59 +59,6 @@ export default function Home() {
   let note;
 
   //#########################################//
-  //                Player                   //
-  //#########################################//
-
-  const playNotes = async (notes) => {
-    // if (isButtonDisabled) {
-    //   return; 
-    // }
-    if (Tone.Transport.state === "stopped") {
-      Tone.Transport.stop();
-    } 
-    const synth = loadInstrument(instrument);
-    let index = 0;
-    const translatedMidiNotes = translateMelody(midiNotes);
-    translatedMidiNotes?.forEach((note, index) => {
-      if (!note.includes(octave)) {
-        midiNotes[index] = note + octave;
-      }
-    });
-  
-    console.log("melody4", midiNotes);
-    setMidiNotes(midiNotes);
-  
-    const playNote = async () => {
-      await Tone.ToneAudioBuffer.loaded().then(() => {
-        synth.then((instrument) => {
-          instrument.triggerAttackRelease(notes[index], "6n");
-          console.log('Tone.Transport.state', Tone.Transport.state);
-        });
-      });
-      index++;
-      // setButtonDisabled(true);
-    // setTimeout(() => {
-    //   setButtonDisabled(false);
-    // }, 4000);
-      if (index >= notes.length) {
-        index = 0; // Reset index to replay from the beginning
-      }
-    };
-  
-    for(let i = 0; i < 30; i++) {
-       await playNote();
-       await new Promise((playAgain) => setTimeout(playAgain, mirrorValue(bpm)));
-    }
-  };
-  
-
-  function mirrorValue(value) {
-    var range = 480 - 160;
-    var mirroredValue = range - (value - 160);
-    return mirroredValue;
-  }
-
-  //#########################################//
   //               GENERATOR                 //
   //#########################################//
 
@@ -115,11 +69,13 @@ export default function Home() {
       melody.splice(0, melody.length);
     }
 
+    console.log("roooootNote", rootNote);
     for (let i = 0; i < melodyLength; i++) {
       // Random integer between 0 and the length of array
       randomNumber = Math.floor(Math.random() * scale[selectedScale]?.length);
       // Add Scale
-      note = root + scale[selectedScale][randomNumber];
+      note = rootNote + scale[selectedScale][randomNumber];
+      console.log("noooooooote", note);
       melody.push(note);
 
       if (melodyLength > 5 && melody.length < melodyLength) {
@@ -144,13 +100,77 @@ export default function Home() {
       melody.splice(melodyLength, melody.length - melodyLength);
     }
     if (prevMelody !== null && melody !== prevMelody) {
-        setPrevMelody(melody);
-        //  console.log("prevMelody",translateMelody(prevMelody));
-      }
+      setPrevMelody(melody);
+      console.log(
+        "prevMelody",
+        translateMelody(prevMelody),
+        "melody",
+        translateMelody(melody)
+      );
+    }
+    console.log("prevMelody", translateMelody(prevMelody));
 
-      
-        setMidiNotes(melody);
-    setNotes(translateMelody(melody).join(" "));
+    setMidiNotes(melody);
+    setNotes(translateMelody(melody)?.join(" "));
+  }
+
+  //#########################################//
+  //                Player                   //
+  //#########################################//
+
+  const playNotes = async (notes) => {
+    // if (isButtonDisabled) {
+    //   return;
+    // }
+    if (Tone.Transport.state === "stopped") {
+      console.log("55555555555 zeby", Tone.Transport.state);
+    }
+    const synth = loadInstrument(instrument);
+    let index = 0;
+    const translatedMidiNotes = translateMelody(midiNotes);
+    translatedMidiNotes?.forEach((note, index) => {
+      if (!note.includes(octave)) {
+        midiNotes[index] = note + octave;
+      }
+    });
+
+    console.log("melody4", midiNotes);
+    setMidiNotes(midiNotes);
+
+    const playNote = async () => {
+      await Tone.ToneAudioBuffer.loaded().then(() => {
+        synth.then((instrument) => {
+          Tone.Transport.start();
+          instrument.triggerAttackRelease(
+            notes[index],
+            Math.floor(Math.random() * 4) + 1 + "n"
+          );
+          // console.log('Tone.Transport.state', Tone.Transport.state);
+        });
+      });
+      index++;
+      // setButtonDisabled(true);
+      // setTimeout(() => {
+      //   setButtonDisabled(false);
+      // }, 4000);
+      if (index >= notes.length) {
+        index = 0; // Reset index to replay from the beginning
+      }
+    };
+
+    console.log('melodyLength * cycles', notes.length * cycles);
+      for (let i = 0; i < (notes.length * cycles) ; i++) {
+        await playNote();
+        await new Promise((playAgain) =>
+          setTimeout(playAgain, mirrorValue(bpm))
+        );
+      }
+  };
+
+  function mirrorValue(value) {
+    var range = 480 - 160;
+    var mirroredValue = range - (value - 160);
+    return mirroredValue;
   }
 
   //#########################################//
@@ -165,7 +185,6 @@ export default function Home() {
 
   const handleOctaveChange = (selectedOctave) => {
     setOctave(selectedOctave);
-    // set melody to new cotave value
   };
 
   const handleMelodyLengthChange = (selectedLength) => {
@@ -180,9 +199,26 @@ export default function Home() {
     setSelectedScale(selectedScale);
   };
 
+  const handleRootNoteChange = (selectedRootNote) => {
+    console.log("selectedRootNote selectedRootNote:", selectedRootNote);
+    setRootNote(selectedRootNote);
+  };
+
+  const handleCyclesChange = (selectedCycles) => {
+    setcycles(selectedCycles);
+  }
+
   const handleMidiCheckbox = (event) => {
     setIsChecked(event.target.checked);
     location.reload();
+  };
+
+  const reverseMelody = () => {
+    Transport.stop();
+  };
+
+  const handleToggleDropdowns = () => {
+    setShowDropdowns(!showDropdowns);
   };
 
   return (
@@ -195,28 +231,69 @@ export default function Home() {
         checked={isChecked}
         onChange={handleMidiCheckbox}
       />
-      <br/>
-        <Scale onChange={handleScaleChange} />
-        <Octave onChange={handleOctaveChange} />
-      
-      <br />
-      <MelodyLength onChange={handleMelodyLengthChange} />
-      <p class="melody">{notes}</p>
-      <Instrument onChange={handleInstrumentChange} />
       <br />
       <div>
-        <Keyboard notes={midiNotes} />
+      <button class="menuButton" onClick={handleToggleDropdowns}>
+        <Edit/>
+      </button>
+      {showDropdowns && (
+        <div class="menuOptions">
+          <div>
+            Scale <Scale onChange={handleScaleChange} />
+          </div>
+          <div>
+            Octave <Octave onChange={handleOctaveChange} />
+          </div>
+          <div>
+            Length <MelodyLength onChange={handleMelodyLengthChange} />
+          </div>
+          <div>
+            Root <RootNote onChange={handleRootNoteChange} />
+          </div>
+          <div>
+            Cycles <Cycles onChange={handleCyclesChange} />
+          </div>
+          <div>
+            Instrument <Instrument onChange={handleInstrumentChange} />
+          </div>
+        </div>
+      )}
+    </div>
+    <br/>
+      <div>
+        
+        <Keyboard notes={midiNotes} instrument={instrument} octave={octave}/>
+        <p class="melody">{notes}</p>
+        {/* <p class="melody">{translateMelody(prevMelody)?.join(" ")}</p> */}
         <button
-        className="playButton"
-        hidden={midiNotes.length === 0}
-        onClick={() => playNotes(midiNotes)}
-        // disabled={isButtonDisabled}
-      >
-        <Play />
-      </button>
+          className="rewindButton"
+          hidden={midiNotes.length === 0}
+          onClick={() => reverseMelody()}
+        >
+          <Reverse />
+        </button>
         <button class="round-button" onClick={generateMelody}>
-        <Shuffle />
-      </button>
+          <Shuffle />
+        </button>
+        <button
+          className="playButton"
+          hidden={midiNotes.length === 0}
+          onClick={() => playNotes(midiNotes)}
+          // disabled={isButtonDisabled}
+        >
+          <Play />
+        </button>
+        <div>
+          <input
+            type="range"
+            class="slider"
+            min="160"
+            max="380"
+            value={bpm}
+            onChange={handleBpmChange}
+          />
+          {/* <p>BPM: {bpm*0.5}</p> */}
+        </div>
       </div>
     </div>
   );
