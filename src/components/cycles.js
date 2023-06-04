@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function Cycles({ onChange }) {
-  const [cycles, setCycles] = useState(3);
+  const [cycles, setCycles] = useState(2);
 
   function handleCyclesChange(event) {
     const selectedCycles = event.target.value;
