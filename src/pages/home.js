@@ -15,13 +15,11 @@ import translateMelody from "../components/translateMelody";
 import connectMidi from "../components/connectMidi";
 import loadInstrument from "../components/loadInstrument";
 import Instrument from "../components/instrument";
-// import generateMelodyy from "../components/generateMelody";
-// import { Piano } from "../icons/piano";
-// import { Sampler } from "tone";
 
 export default function Home() {
   const [notes, setNotes] = useState(""); // pitch notes
   const [midiNotes, setMidiNotes] = useState([]);
+  const [keyboardNotes, setKeyboardNotes] = useState([]);
   const [selectedScale, setSelectedScale] = useState(5);
   const [melodyLength, setMelodyLength] = useState(6);
   const [rootNote, setRootNote] = useState(48);
@@ -32,6 +30,10 @@ export default function Home() {
   const [isChecked, setIsChecked] = useState(false);
   const [prevMelody, setPrevMelody] = useState([]);
   const [showDropdowns, setShowDropdowns] = useState(false);
+  const [melodyCollection, setMelodyCollection] = useState([]);
+  let melodysCollection = {
+    melodies: [],
+  };
   // const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
@@ -99,17 +101,26 @@ export default function Home() {
     }
     if (prevMelody !== null && prevMelody !== melody) {
       setPrevMelody(melody);
-      // console.log(
-      //   "prevMelody",
-      //   translateMelody(prevMelody),
-      //   "melody",
-      //   translateMelody(melody)
-      // );
+      melodysCollection.melodies.prevMelody = prevMelody;
+      setMelodyCollection(melodysCollection.melodies.prevMelody);
+      // setPrevMelody(melodysCollection.melodies.prevMelody);
+      console.log(
+        "prevMelody",
+        prevMelody,
+        "melody",
+        melody
+      );
     }
-    // console.log("prevMelodyyyyyy", translateMelody(prevMelody));
-
-    setMidiNotes(melody);
+     console.log("melody", melody);
+     const melodyCopy = [...melody]; // Create a copy of the melody array
+     melodysCollection.melodies.push(melodyCopy);
+     console.log('melodysCollectionnnnnnnn', melodysCollection);
+     setMidiNotes(melody);
+     const kkkNotes = melody;
+     setKeyboardNotes(kkkNotes)
+    // setMidiNotes([48, 49, 50, 50, 50, 50, 50, 55, 56]);
     setNotes(translateMelody(melody)?.join(" "));
+    return midiNotes;
   }
 
   //#########################################//
@@ -117,14 +128,10 @@ export default function Home() {
   //#########################################//
 
   const playNotes = async (notes) => {
-    // if (isButtonDisabled) {
-    //   return;
-    // }
-    if (Tone.Transport.state === "stopped") {
-      console.log("55555555555 zeby", Tone.Transport.state);
-    }
     const synth = loadInstrument(instrument);
     let index = 0;
+    // setKeyboardNotes(midiNotes);
+    // find another solution so the keyboard does not stop playing
     const translatedMidiNotes = translateMelody(midiNotes);
     translatedMidiNotes?.forEach((note, index) => {
       if (!note.includes(octave)) {
@@ -212,12 +219,18 @@ export default function Home() {
   };
 
   const reverseMelody = () => {
+   
     console.log('prevMelody', prevMelody);
     console.log('midiNotes', midiNotes);
-    setMidiNotes(prevMelody)
-    setPrevMelody(midiNotes)
-    console.log('translateMelody(prevMelody)?.join("")', translateMelody(prevMelody)?.join(""));
-    setNotes(translateMelody(prevMelody)?.join(" "))
+    console.log('melodyCollection',melodyCollection);
+    if(prevMelody === midiNotes){
+      setMidiNotes(melodyCollection);
+      setNotes(translateMelody(melodyCollection)?.join(" "))
+    }else {
+      setMidiNotes(prevMelody);
+      setNotes(translateMelody(prevMelody)?.join(" "))
+    }
+    console.log('melodysCollection.prevMelody', melodysCollection);
   };
 
   const handleToggleDropdowns = () => {
@@ -265,21 +278,21 @@ export default function Home() {
     <br/>
       <div>
         
-        <Keyboard notes={midiNotes} instrument={instrument} octave={octave}/>
+        <Keyboard notes={keyboardNotes} instrument={instrument} octave={octave} bpm={bpm} cycles={cycles}/>
         <p class="melody">{notes}</p>
         {/* <p class="melody">{translateMelody(prevMelody)?.join(" ")}</p> */}
-        {/* <button
+        <button
           className="rewindButton"
           hidden={midiNotes.length === 0}
           onClick={() => reverseMelody()}
         >
           <Reverse />
-        </button> */}
+        </button>
         <button class="round-button" onClick={generateMelody}>
           <Shuffle />
         </button>
         <button
-          className="round-button"
+          className="rewindButton"
           hidden={midiNotes.length === 0}
           onClick={() => playNotes(midiNotes)}
           // disabled={isButtonDisabled}

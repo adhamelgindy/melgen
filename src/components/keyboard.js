@@ -3,7 +3,7 @@ import translateMelody from "./translateMelody";
 import loadInstrument from "./loadInstrument";
 import * as Tone from "tone";
 
-export default function Keyboard({ notes, instrument, octave }) {
+export default function Keyboard({ notes, instrument, octave, bpm, cycles }) {
   // console.log('instrumentinstrumentinstrumentinstrument', instrument);
   const [notesString, setNotesString] = useState("");
   const synth = loadInstrument(instrument);
@@ -14,18 +14,66 @@ export default function Keyboard({ notes, instrument, octave }) {
 
   useEffect(() => {
     const keys = document.querySelectorAll(".key");
-    keys.forEach((key) => {
-      const note = key.dataset.note;
-      if (notesString) {
-        const translatedMelody = translateMelody(notesString);
-        if (translatedMelody?.includes(note)) {
-          key.classList.add("active");
-        } else {
-          key.classList.remove("active");
-        }
+    let index = 0;
+  
+    const activateNextKey = () => {
+      const translatedMelody = translateMelody(notesString);
+        const filteredTranslatedMelody = translatedMelody?.filter((element) => element !== "");
+      if (notesString) { 
+        filteredTranslatedMelody?.forEach(notaa => {
+          
+          keys.forEach((key) => {
+            const note = key.dataset.note;
+            const noteIndex = filteredTranslatedMelody?.indexOf(note);
+            //  console.log('noteIndex', noteIndex);
+            // if (notaa === note) {
+            if (noteIndex === index) {
+              // console.log('i', index);
+    if (!key.classList.contains("active")) {
+      key.classList.add("active");
+    }
+  } else {
+    key.classList.remove("active");
+  }
+          });
+        }) 
+       
+      } 
+      else {
+        console.log('removeeeeeeeeeeee');
       }
-    });
+      index++;
+      // keep repeating 
+      if (index >= filteredTranslatedMelody?.length) {
+        index = 0;
+      }
+    };
+  
+    const interval = setInterval(() => {
+      activateNextKey();
+      // setTimeout(() => {
+      //   activateNextKey();
+      // }, 500000); // Hold half a second on each key
+    }, 500); // Set the desired time interval between key activations
+  
+    // keys.forEach((key) => {
+    //   const note = key.dataset.note;
+    //   if (notesString) {
+    //     const translatedMelody = translateMelody(notesString);
+    //     if (translatedMelody?.includes(note)) {
+    //       key.classList.add("active");
+    //     } else {
+    //       key.classList.remove("active");
+    //     }
+    //   }
+    // });
+    return () => {
+      clearInterval(interval); // Clean up the interval when the component unmounts
+    };
   }, [notesString]);
+  
+
+  // useLayoutEffect(() => {});
 
   const handleKeyDown = async (note) => {
     if (instrument) {
@@ -48,6 +96,12 @@ export default function Keyboard({ notes, instrument, octave }) {
       // instrument.triggerRelease(note);
     }
   };
+
+  function mirrorValue(value) {
+    var range = 480 - 160;
+    var mirroredValue = range - (value - 160);
+    return mirroredValue;
+  }
 
   return (
     <div>

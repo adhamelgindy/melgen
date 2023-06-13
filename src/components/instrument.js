@@ -22,6 +22,7 @@ export default function Instrument({ onChange }) {
           <option value="Guitar">Guitar</option>
           <option value="Sampler">Piano</option>
           <option value="Saxophone">Saxophone</option>
+          <option value="Contrabass">contrabass</option>
           {/* <option value="Xylophone">Xylophone</option> */}
           {/* <option value="MonoSynth">MonoSynth</option>
           <option value="PolySynth">PolySynth</option>

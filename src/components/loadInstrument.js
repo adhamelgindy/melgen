@@ -119,6 +119,23 @@ async function loadInstrument(instrument) {
         },
       }).toDestination();
       break;
+
+      case "Contrabass":
+      // setInstrument('Electric')
+      synth = new Sampler({
+        urls: {
+          A2: "A2.mp3",
+          B3: "B3.mp3",
+          D2: "D2.mp3",
+        },
+
+        baseUrl: "/sampler/contrabass/",
+
+        onload: () => {
+          console.log("loaded");
+        },
+      }).toDestination();
+      break;
   }
   return synth;
 }
