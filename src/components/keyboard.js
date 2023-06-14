@@ -2,76 +2,104 @@ import { useState, useEffect } from "react";
 import translateMelody from "./translateMelody";
 import loadInstrument from "./loadInstrument";
 import * as Tone from "tone";
+import translateMelodyMidi from "./translateMelodyMidi";
 
 export default function Keyboard({ notes, instrument, octave, bpm, cycles }) {
   // console.log('instrumentinstrumentinstrumentinstrument', instrument);
   const [notesString, setNotesString] = useState("");
+  const [stableNotes, setStableNotes] = useState([]);
   const synth = loadInstrument(instrument);
 
   useEffect(() => {
+    // if (notes.some((item) => typeof item === "number")){
+    //   setStableNotes(notes)
+    // }
     setNotesString(notes);
   }, [notes]);
 
   useEffect(() => {
     const keys = document.querySelectorAll(".key");
-    let index = 0;
-  
-    const activateNextKey = () => {
-      const translatedMelody = translateMelody(notesString);
-        const filteredTranslatedMelody = translatedMelody?.filter((element) => element !== "");
-      if (notesString) { 
-        filteredTranslatedMelody?.forEach(notaa => {
-          
-          keys.forEach((key) => {
-            const note = key.dataset.note;
-            const noteIndex = filteredTranslatedMelody?.indexOf(note);
-            //  console.log('noteIndex', noteIndex);
-            // if (notaa === note) {
-            if (noteIndex === index) {
-              // console.log('i', index);
-    if (!key.classList.contains("active")) {
-      key.classList.add("active");
-    }
-  } else {
-    key.classList.remove("active");
-  }
+      console.log('???', notes.some((item) => typeof item === "number"));
+      let index = 0;
+
+      const activateKeys = () => {
+        const midiNotes = translateMelodyMidi(notes)
+        keys.forEach((key) => {
+          const note = key.dataset.note;
+          if (midiNotes) {
+            const translatedMelody = translateMelody(midiNotes);
+            if (translatedMelody?.includes(note)) {
+              key.classList.add("active");
+            } else {
+              key.classList.remove("active");
+            }
+          }
+        });
+      }
+      
+      const activateNextKey = () => {
+        if (notes.some((item) => typeof item === "number")){
+          setStableNotes(notes)
+        } else {
+          setStableNotes("")
+        }
+        console.log("notesString", notesString);
+        let translatedMelody;
+        let filteredTranslatedMelody;
+        // const hasNumbers = arr => arr.some(item => typeof item === 'number');
+        for (let i = 0; i < notesString.length; i++) {
+          if (typeof notesString[i] === "number") {
+            translatedMelody = translateMelody(notesString);
+          } else {
+            translatedMelody = notesString;
+          }
+        }
+        filteredTranslatedMelody = translatedMelody?.filter(
+          (element) => element !== ""
+        );
+        if (translatedMelody) {
+          filteredTranslatedMelody?.forEach((notaa) => {
+            keys.forEach((key) => {
+              const note = key.dataset.note;
+              const noteIndex = filteredTranslatedMelody?.indexOf(note);
+              //  console.log('noteIndex', noteIndex);
+              // if (notaa === note) {
+              if (noteIndex === index) {
+                // console.log('i', index);
+                if (!key.classList.contains("active")) {
+                  key.classList.add("active");
+                }
+              } else {
+                key.classList.remove("active");
+              }
+            });
           });
-        }) 
-       
-      } 
-      else {
-        console.log('removeeeeeeeeeeee');
-      }
-      index++;
-      // keep repeating 
-      if (index >= filteredTranslatedMelody?.length) {
-        index = 0;
-      }
-    };
-  
-    const interval = setInterval(() => {
-      activateNextKey();
-      // setTimeout(() => {
-      //   activateNextKey();
-      // }, 500000); // Hold half a second on each key
-    }, 500); // Set the desired time interval between key activations
-  
-    // keys.forEach((key) => {
-    //   const note = key.dataset.note;
-    //   if (notesString) {
-    //     const translatedMelody = translateMelody(notesString);
-    //     if (translatedMelody?.includes(note)) {
-    //       key.classList.add("active");
-    //     } else {
-    //       key.classList.remove("active");
-    //     }
-    //   }
-    // });
-    return () => {
-      clearInterval(interval); // Clean up the interval when the component unmounts
-    };
+        } else {
+          console.log("removeeeeeeeeeeee");
+        }
+        index++;
+        // keep repeating
+        if (index >= filteredTranslatedMelody?.length) {
+          index = 0;
+        }
+      };
+
+      const interval = setInterval(() => {
+        if (notes.some((item) => typeof item === "number")) {
+          activateNextKey();
+        } else {
+          activateKeys();
+        }
+        // setTimeout(() => {
+        //   activateNextKey();
+        // }, 500000); // Hold half a second on each key
+      }, 400); 
+
+      return () => {
+        clearInterval(interval); // Clean up the interval when the component unmounts
+      };
+    // }
   }, [notesString]);
-  
 
   // useLayoutEffect(() => {});
 

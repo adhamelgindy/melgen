@@ -120,7 +120,6 @@ export default function Home() {
      setKeyboardNotes(kkkNotes)
     // setMidiNotes([48, 49, 50, 50, 50, 50, 50, 55, 56]);
     setNotes(translateMelody(melody)?.join(" "));
-    return midiNotes;
   }
 
   //#########################################//
@@ -130,6 +129,7 @@ export default function Home() {
   const playNotes = async (notes) => {
     const synth = loadInstrument(instrument);
     let index = 0;
+    console.log("melody3", midiNotes);
     // setKeyboardNotes(midiNotes);
     // find another solution so the keyboard does not stop playing
     const translatedMidiNotes = translateMelody(midiNotes);
@@ -140,7 +140,18 @@ export default function Home() {
     });
 
     console.log("melody4", midiNotes);
-    setMidiNotes(midiNotes);
+     setMidiNotes(midiNotes);
+
+     // Snare setup
+    //  const snare = new Tone.Player('../sampler/snare808.mp3').toDestination();
+
+    //  let snareSeq = new Tone.Sequence(
+    //    function (time) {
+    //      snare.start(time);
+    //    },
+    //    Array(8).fill(null),
+    //    '8n'
+    //  ).start();
 
     const playNote = async () => {
       await Tone.ToneAudioBuffer.loaded().then(() => {
@@ -241,7 +252,7 @@ export default function Home() {
     <div class="melody">
       <label>MIDI:</label>
       <input
-        className="slider"
+        class="slider"
         type="checkbox"
         id="midi-checkbox"
         checked={isChecked}
@@ -249,6 +260,13 @@ export default function Home() {
       />
       <br />
       <div>
+      <button
+          class="menuButton"
+          hidden={midiNotes.length === 0}
+          onClick={() => reverseMelody()}
+        >
+          <Reverse />
+        </button>
       <button class="menuButton" onClick={handleToggleDropdowns}>
         <Edit/>
       </button>
@@ -278,21 +296,15 @@ export default function Home() {
     <br/>
       <div>
         
-        <Keyboard notes={keyboardNotes} instrument={instrument} octave={octave} bpm={bpm} cycles={cycles}/>
+        <Keyboard notes={midiNotes} instrument={instrument} octave={octave} bpm={bpm} cycles={cycles}/>
         <p class="melody">{notes}</p>
         {/* <p class="melody">{translateMelody(prevMelody)?.join(" ")}</p> */}
-        <button
-          className="rewindButton"
-          hidden={midiNotes.length === 0}
-          onClick={() => reverseMelody()}
-        >
-          <Reverse />
-        </button>
+       
         <button class="round-button" onClick={generateMelody}>
           <Shuffle />
         </button>
         <button
-          className="rewindButton"
+         class="round-button"
           hidden={midiNotes.length === 0}
           onClick={() => playNotes(midiNotes)}
           // disabled={isButtonDisabled}

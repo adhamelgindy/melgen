@@ -136,6 +136,21 @@ async function loadInstrument(instrument) {
         },
       }).toDestination();
       break;
+
+      case "Snare":
+      // setInstrument('Electric')
+      synth = new Sampler({
+        urls: {
+          snare808: "snare808.mp3",
+        },
+
+        baseUrl: "/sampler/snare/",
+
+        onload: () => {
+          console.log("loaded");
+        },
+      }).toDestination();
+      break;
   }
   return synth;
 }
