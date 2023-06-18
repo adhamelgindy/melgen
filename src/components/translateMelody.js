@@ -1,6 +1,6 @@
 import addrhythm from "./addRhythm";
 
-function translateMelody(melody) {
+function translateMelody(melody, genre) {
   // console.log('originalMelody', melody);
   const notes = [];
   try{
@@ -89,10 +89,9 @@ function translateMelody(melody) {
   
 
   const musicNotes = [...notes];
-  // console.log('musicNotesmusicNotes', musicNotes);
 
-  addrhythm(musicNotes);
-  return addrhythm(musicNotes);
+  addrhythm(musicNotes, genre);
+  return addrhythm(musicNotes, genre);
 }
 
 export default translateMelody;

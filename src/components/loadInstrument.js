@@ -2,9 +2,6 @@ import * as Tone from "tone";
 import { Sampler } from "tone";
 
 async function loadInstrument(instrument) {
-  // const [instrument, setInstrument] = useState();
-
-  console.log("instrument", instrument);
   let synth;
   switch (instrument) {
     case "MonoSynth":
@@ -30,7 +27,6 @@ async function loadInstrument(instrument) {
         baseUrl: "/sampler/piano/",
 
         onload: () => {
-          console.log("loaded");
           // synth.isLoaded
         },
       }).toDestination();

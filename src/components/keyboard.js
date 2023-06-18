@@ -19,7 +19,6 @@ export default function Keyboard({ notes, instrument, octave, bpm, cycles }) {
 
   useEffect(() => {
     const keys = document.querySelectorAll(".key");
-      console.log('???', notes.some((item) => typeof item === "number"));
       let index = 0;
 
       const activateKeys = () => {
@@ -43,7 +42,7 @@ export default function Keyboard({ notes, instrument, octave, bpm, cycles }) {
         } else {
           setStableNotes("")
         }
-        console.log("notesString", notesString);
+        // console.log("notesString", notesString);
         let translatedMelody;
         let filteredTranslatedMelody;
         // const hasNumbers = arr => arr.some(item => typeof item === 'number');
@@ -93,7 +92,7 @@ export default function Keyboard({ notes, instrument, octave, bpm, cycles }) {
         // setTimeout(() => {
         //   activateNextKey();
         // }, 500000); // Hold half a second on each key
-      }, 400); 
+      }, 600); 
 
       return () => {
         clearInterval(interval); // Clean up the interval when the component unmounts

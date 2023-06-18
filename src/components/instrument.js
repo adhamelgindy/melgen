@@ -10,8 +10,8 @@ export default function Instrument({ onChange }) {
   }
 
   return (
-    <div class="parameters">
-      <div class="dropdown">
+    <div className="parameters">
+      <div className="dropdown">
         <select
           id="number-dropdown"
           value={instrument}
