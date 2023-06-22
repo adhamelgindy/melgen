@@ -12,10 +12,13 @@ import Octave from "../components/octave";
 import Cycles from "../components/cycles";
 import MelodyLength from "../components/melodyLength";
 import translateMelody from "../components/translateMelody";
+import translateMelodyMidi from "../components/translateMelodyMidi";
 import connectMidi from "../components/connectMidi";
+import MidiUtils from "../components/midiUtils";
 import loadInstrument from "../components/loadInstrument";
 import Instrument from "../components/instrument";
 import Genre from "../components/genre";
+import { connect, initDevices } from '../components/midiUtils';
 
 export default function Home() {
   const [notes, setNotes] = useState(""); // pitch notes
@@ -33,15 +36,33 @@ export default function Home() {
   const [prevMelody, setPrevMelody] = useState([]);
   const [showDropdowns, setShowDropdowns] = useState(false);
   const [melodyCollection, setMelodyCollection] = useState([]);
+  const [midiIn, setMidiIn] = useState('');
   let melodysCollection = {
     melodies: [],
   };
   // const [isButtonDisabled, setButtonDisabled] = useState(false);
 
   useEffect(() => {
-    connectMidi(instrument);
+    // set an interval that keeps repeatining 
+     connectMidi(instrument);
+    // connectMidi(instrument).then(midi => {
+    //   setMidiIn(midi);
+    // })
+    //  console.log('connectMidi(instrument)', connectMidi(instrument));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // useEffect(() => {
+  //   // This effect will run when MIDI devices change
+  //   // You can perform additional logic here if needed
+  //   // For example, you can initialize the MIDI devices
+  //   const midiAccess = navigator.requestMIDIAccess();
+  //   midiAccess.then((midi) => initDevices(midi));
+
+  //   return () => {
+  //     // Cleanup if needed
+  //   };
+  // }, []);
 
   // let root = rootNote;
   let scale = [
@@ -106,22 +127,14 @@ export default function Home() {
       melodysCollection.melodies.prevMelody = prevMelody;
       setMelodyCollection(melodysCollection.melodies.prevMelody);
       // setPrevMelody(melodysCollection.melodies.prevMelody);
-      console.log(
-        "prevMelody",
-        prevMelody,
-        "melody",
-        melody
-      );
     }
      console.log("melody", melody);
      const melodyCopy = [...melody]; // Create a copy of the melody array
      melodysCollection.melodies.push(melodyCopy);
-     console.log('melodysCollectionnnnnnnn', melodysCollection);
      setMidiNotes(melody);
-     const kkkNotes = melody;
-     setKeyboardNotes(kkkNotes)
-    // setMidiNotes([48, 49, 50, 50, 50, 50, 50, 55, 56]);
-    setNotes(translateMelody(melody)?.join(" "));
+     const keyNotes = melody;
+     setKeyboardNotes(keyNotes)
+      setNotes(translateMelody(melody)?.join(" "));
   }
 
   //#########################################//
@@ -243,18 +256,25 @@ export default function Home() {
   };
 
   const reverseMelody = () => {
-   
     console.log('prevMelody', prevMelody);
     console.log('midiNotes', midiNotes);
-    console.log('melodyCollection',melodyCollection);
     if(prevMelody === midiNotes){
       setMidiNotes(melodyCollection);
-      setNotes(translateMelody(melodyCollection)?.join(" "))
-    }else {
-      setMidiNotes(prevMelody);
-      setNotes(translateMelody(prevMelody)?.join(" "))
+      if(melodyCollection.length > midiNotes.length){
+        const midiNote = translateMelodyMidi(melodyCollection)
+         setNotes(translateMelody(midiNote)?.join(" "))
+
+      } else {
+        setNotes(translateMelody(melodyCollection)?.join(" "))
+      }
+      console.log('? ? ?', melodyCollection);
     }
-    console.log('melodysCollection.prevMelody', melodysCollection);
+      // console.log('melodyZobrrrr',midiNote);
+    // }else {
+    //   console.log('melodyCollection',melodyCollection);
+    //   setMidiNotes(prevMelody);
+    //   setNotes(translateMelody(prevMelody)?.join(" "))
+    // }
   };
 
   const handleToggleDropdowns = () => {
@@ -263,6 +283,7 @@ export default function Home() {
 
   return (
     <div className="melody">
+      <MidiUtils/>
       <label>MIDI:</label>
       <input
         className="slider"
@@ -270,13 +291,14 @@ export default function Home() {
         id="midi-checkbox"
         checked={isChecked}
         onChange={handleMidiCheckbox}
-      />
+        />
+        <label>MIDI In: {midiIn}</label>
       <br />
       <div>
       <button
           className="menuButton"
           hidden={midiNotes.length === 0}
-          disabled={prevMelody !== midiNotes}
+          disabled={prevMelody !== midiNotes || melody === melodyCollection}
           onClick={() => reverseMelody()}
         >
           <Reverse />

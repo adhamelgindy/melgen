@@ -90,7 +90,7 @@ function translateMelody(melody, genre) {
 
   const musicNotes = [...notes];
 
-  addrhythm(musicNotes, genre);
+   addrhythm(musicNotes, genre);
   return addrhythm(musicNotes, genre);
 }
 

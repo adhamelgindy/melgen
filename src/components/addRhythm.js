@@ -78,7 +78,7 @@ function addrhythm(melody, genre) {
   if (rhythmicMelody[0] === "") rhythmicMelody.shift(); 
 
   // always add one empty string in the end 
-  rhythmicMelody.push("", "");
+  rhythmicMelody.push("");
 
   // console.log('rhythmicMelody', rhythmicMelody);
   return rhythmicMelody;
