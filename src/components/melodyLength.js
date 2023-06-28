@@ -13,6 +13,7 @@ export default function MelodyLength({ onChange }) {
     <div className="parameters">
       <div className="dropdown">
         <select id="number-dropdown" value={numNotes} onChange={handleNumNotes}>
+          <option value="2">2</option>
           <option value="4">4</option>
           <option value="6">6</option>
           <option value="8">8</option>

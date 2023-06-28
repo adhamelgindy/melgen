@@ -47,7 +47,7 @@ async function loadInstrument(instrument) {
         baseUrl: "/sampler/guitar/",
 
         onload: () => {
-          console.log("loaded");
+          // console.log("loaded");
         },
       }).toDestination();
       break;
@@ -143,7 +143,7 @@ async function loadInstrument(instrument) {
         baseUrl: "/sampler/snare/",
 
         onload: () => {
-          console.log("loaded");
+          // console.log("loaded");
         },
       }).toDestination();
       break;
