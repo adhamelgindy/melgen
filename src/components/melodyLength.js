@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export default function MelodyLength({ onChange }) {
-  const [numNotes, setNumNotes] = useState(6);
+  const [numNotes, setNumNotes] = useState(8);
 
   function handleNumNotes(event) {
     const _numNotes = event.target.value;

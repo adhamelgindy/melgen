@@ -74,12 +74,13 @@ function addrhythm(melody, genre) {
       }
     }
   
+    // console.log('rhythmicMelody', rhythmicMelody);
 // Remove empty string at the beginning
   if (rhythmicMelody[0] === "") rhythmicMelody.shift(); 
+  if (rhythmicMelody[1] === "") rhythmicMelody.shift(); 
 
   // always add one empty string in the end 
   rhythmicMelody.push("");
-
   // console.log('rhythmicMelody', rhythmicMelody);
   return rhythmicMelody;
 }

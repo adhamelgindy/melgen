@@ -20,7 +20,9 @@ const Button = ({ onClick, children }) => {
 };
 
 const MidiUtils = (instrument) => {
+  const [midiIntial, setMidiIntial] = useState([]);
   const [midiIn, setMidiIn] = useState([]);
+  const [midiInDevice, setMidiInDevice] = useState([]);
   const [midiOut, setMidiOut] = useState([]);
   const [showDropdowns, setShowDropdowns] = useState(false);
   const [notesOn, setNotesOn] = useState(new Map());
@@ -44,7 +46,7 @@ const MidiUtils = (instrument) => {
     midi.addEventListener('statechange', midiStateChangeHandler);
     initDevices(midi);
     let midiInput = Array.from(midi.inputs.values());
-     connectMidi(instrument, midiIn);
+     connectMidi(instrument, midiInDevice);
     // Call connectMidi with the desired instrument
   }
 
@@ -57,57 +59,69 @@ const MidiUtils = (instrument) => {
     console.log('inputs', inputs);
     const outputs = Array.from(midi.outputs.values());
     // const inputDeviceNames = inputs.map((device) => device.name);
-    setMidiIn(inputs.map((device) => device.name));
+    const defaultDeviceName = inputs.length > 0 ? inputs[0].name : 'No default device available';
+    console.log('defaultDeviceName', defaultDeviceName);
+    if (!midiInDevice){   
+      setMidiInDevice(findMIDIDeviceByName(inputs, defaultDeviceName));
+    }
+
+
+    setMidiIn(inputs.map((device) =>  device.name));
+    console.log('???????midiIn', midiIn);
+    console.log('device>?????????', midiInDevice);
+    
     setMidiOut(outputs.map((device) => device.name));
+    setMidiIntial(midi)
+  }
+
+  function findMIDIDeviceByName(devices, name) {
+    console.log('');
+    for (let i = 0; i < devices.length; i++) {
+      if (devices[i].name === name) {
+        return devices[i];
+      }
+    }
+    return null; // Return null if the device is not found
   }
 
   const handleInputSelectChange = (e) => {
-    const selectedDevice = e.target.value; // Get the selected device name from the event
-  
-    if (!midi) {
-      console.error('MIDI access is not available');
-      return;
-    }
-  
-    // Check if midi.inputs is defined before iterating over it
-    const selectedInput = Array.from(midi.inputs.values()).find(
-      (device) => device.name === selectedDevice
-    );
-  
-    if (selectedInput) {
-      // Handle the selected input device
-      // For example, you can pass it to the connectMidi function
-      connectMidi(instrument, selectedInput);
-  
-      // Update the midiIn state with the selected device
-      setMidiIn(selectedDevice);
-    } else {
-      console.error('Selected MIDI input device not found');
-      // Handle the case when the selected device is not found
-    }
+   // disconnect last midi on change ??????????????????????????????????????
+    const selectedDevice = e.target.value;
+
+    const inputs = Array.from(midiIntial.inputs.values());
+    console.log('inputs', inputs);
+    console.log('selectedDevice', selectedDevice);
+    // console.log('findMIDIDeviceByName(inputs, selectedDevice)', findMIDIDeviceByName(inputs, selectedDevice));
+const device = findMIDIDeviceByName(inputs, selectedDevice);
+    // findMIDIDeviceByName(inputs, selectedDevice);
+    setMidiInDevice(device);
+    console.log('instrument', instrument);
+    connectMidi(instrument, device)
+    console.log('setMidiInDevicceececee', midiInDevice);
   };
   
   
 
   const handleOutputSelectChange = (e) => {
-    const selectedDevice = e.target.value; // Get the selected device name from the event
+    const selectedDevice = e.target.value; 
   
-    // Find the MIDI output device object based on the selected name
-    const selectedOutput = Array.from(midi.outputs.values()).find(
-      (device) => device.name === selectedDevice
-    );
-  
-    if (selectedOutput) {
-      // Handle the selected output device
-      // For example, you can send MIDI messages to this device
-      // using the Tone.js or Web MIDI API
-  
-      // Update the midiOut state with the selected device
-      setMidiOut(selectedDevice);
-    } else {
-      console.error('Selected MIDI output device not found');
-      // Handle the case when the selected device is not found
-    }
+    const outputs = Array.from(midiIntial.outputs.values());
+    const device = findMIDIDeviceByName(outputs, selectedDevice);
+   connectMidiOut(device); 
+    
+  };
+
+  function connectMidiOut(device) {
+    // Open the MIDI output port
+    device.open()
+      .then(() => {
+        // MIDI output is now connected, you can send MIDI messages
+        console.log('MIDI output connected:', device.name);
+      })
+      .catch((error) => {
+        // Handle any errors that occur during MIDI output connection
+        console.error('Failed to connect MIDI output:', error);
+      });
   };
   
 
@@ -121,7 +135,7 @@ const MidiUtils = (instrument) => {
     Midi
   </button>
   {showDropdowns && (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ display: 'grid'}}>
       <label>Input: </label>
       <Dropdown options={midiIn} onChange={handleInputSelectChange} />
       <label>Output: </label>

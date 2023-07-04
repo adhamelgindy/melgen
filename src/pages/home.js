@@ -4,12 +4,14 @@ import { Shuffle } from "../icons/shuffle";
 import { Play } from "../icons/play";
 import { Reverse } from "../icons/reverse";
 import { Edit } from "../icons/edit";
+import { Drum } from "../icons/drums";
 import * as Tone from "tone";
 import Keyboard from "../components/keyboard";
 import Scale from "../components/scale";
 import RootNote from "../components/rootNote";
 import Octave from "../components/octave";
 import Cycles from "../components/cycles";
+import Drums from "../components/drums";
 import MelodyLength from "../components/melodyLength";
 import translateMelody from "../components/translateMelody";
 import translateMelodyMidi from "../components/translateMelodyMidi";
@@ -18,7 +20,7 @@ import MidiUtils from "../components/midiUtils";
 import loadInstrument from "../components/loadInstrument";
 import Instrument from "../components/instrument";
 import Genre from "../components/genre";
-import { connect, initDevices } from "../components/midiUtils";
+// import { connect, initDevices } from "../components/midiUtils";
 
 export default function Home() {
   const [notes, setNotes] = useState(""); // pitch notes
@@ -26,10 +28,11 @@ export default function Home() {
   const [keyboardNotes, setKeyboardNotes] = useState([]);
   const [selectedScale, setSelectedScale] = useState(5);
   const [selectedGenre, setSelectedGenre] = useState(5);
-  const [melodyLength, setMelodyLength] = useState(6);
+  const [melodyLength, setMelodyLength] = useState(8);
   const [rootNote, setRootNote] = useState(48);
   const [bpm, setBpm] = useState(280);
-  const [cycles, setcycles] = useState(2);
+  const [cycles, setcycles] = useState(3);
+  const [drums, setDrums] = useState('hihat');
   const [octave, setOctave] = useState(4);
   const [instrument, setInstrument] = useState("Sampler");
   const [isChecked, setIsChecked] = useState(false);
@@ -153,69 +156,86 @@ export default function Home() {
   //#########################################//
 
   const playDrums = () => {
-    const snare = new Tone.Player(
-      "/sampler/snare/snare808.mp3"
-    ).toDestination();
-    Tone.Transport.start();
+    const snare = new Tone.Player("/sampler/snare/snare808.mp3").toDestination();
     const snarePattern = new Tone.Pattern(
       (time, note) => {
-        // Tone.ToneAudioBuffer.loaded().then(() => {
-        //   snare?.start(time);
-        // });
+        snare.start(time);
       },
-      Array(4).fill(null),
-      "8n"
+      ["C1"], // Adjust the pattern to hit the snare once
+      "1n"
     );
-    snarePattern.start();
-    snarePattern.stop();
+
+    
+  
+    // Start the drum pattern
+    Tone.ToneAudioBuffer.loaded().then(() => {
+      Tone.Transport.start();
+      snarePattern.start();
+    });
+  
+    // Stop the drum pattern after a specified duration
+    const duration = "1m"; // Adjust the duration based on your melody playback
+    Tone.Transport.scheduleOnce(() => {
+      snarePattern.stop();
+      Tone.Transport.stop();
+    }, duration);
   };
+  
+  const playSnare = () => {
+    const snare = new Tone.Player("/sampler/bass/hihat.mp3").toDestination();
+    
+    // Play the snare immediately
+    Tone.ToneAudioBuffer.loaded().then(() => {
+      snare.start();
+    });
+    
+  
+    // Stop the snare after a specified duration
+    const duration = "1m"; // Adjust the duration based on your desired length
+    Tone.Transport.scheduleOnce(() => {
+      snare.stop();
+    }, duration);
+  };
+  
+  
 
   const playNotes = async (notes) => {
-    const synth = loadInstrument(instrument);
+    const synth = await loadInstrument(instrument);
     let index = 0;
-    console.log("melody3", midiNotes);
-    // setKeyboardNotes(midiNotes);
     const translatedMidiNotes = translateMelody(midiNotes, selectedGenre);
     translatedMidiNotes?.forEach((note, index) => {
       if (!note.includes(octave)) {
         midiNotes[index] = note + octave;
       }
     });
-
-    console.log("melody4", midiNotes);
     setMidiNotes(midiNotes);
-
+  
     // Snare setup
     const playNote = async () => {
       await Tone.ToneAudioBuffer.loaded().then(() => {
-        synth.then((instrument) => {
-          Tone.Transport.start();
-          // let duration;
-          const validValues = ["1", "2", "3", "4", "5", "6"];
-          const duration = validValues.includes(notes[index]) ? "1n" : "4n";
-          instrument.triggerAttackRelease(notes[index], duration);
-          // console.log('Tone.Transport.state', Tone.Transport.state);
-        });
+        synth.triggerAttackRelease(notes[index], "4n");
       });
       index++;
-      // setButtonDisabled(true);
-      // setTimeout(() => {
-      //   setButtonDisabled(false);
-      // }, 4000);
       if (index >= notes.length) {
         index = 0; // Reset index to replay from the beginning
       }
     };
-
-    for (let i = 0; i < notes.length * cycles; i++) {
-      // await playNote();
-      // await new Promise((playAgain) =>
-      //   setTimeout(playAgain, mirrorValue(bpm))
-      // );
-      await Promise.all([playNote(), playDrums()]);
-      await new Promise((resolve) => setTimeout(resolve, mirrorValue(bpm)));
+  
+    Tone.Transport.start();
+    
+    for (let i = 0; i < cycles; i++) {
+      //  playDrums();
+      playSnare();
+      for (let j = 0; j < notes.length; j++) {
+        await playNote();
+        await new Promise((resolve) => setTimeout(resolve, mirrorValue(bpm)));
+      }
     }
+  
+    Tone.Transport.stop();
+    index = 0; // Reset index after playing melody
   };
+  
 
   function mirrorValue(value) {
     var range = 480 - 160;
@@ -243,6 +263,10 @@ export default function Home() {
 
   const handleInstrumentChange = (selectedInstrument) => {
     setInstrument(selectedInstrument);
+  };
+
+  const handleDrumsChange = (selectedDrum) => {
+    setDrums(selectedDrum);
   };
 
   const handleScaleChange = (selectedScale) => {
@@ -274,7 +298,7 @@ export default function Home() {
     console.log("prev", melodyCollection);
     console.log("before prev", prevMelodyCollection);
     
-    if (prevMelody === midiNotes) {
+    if (prevMelody === midiNotes ) {
       setMidiNotes(melodyCollection);
       if (melodyCollection.length > midiNotes.length) {
         const midiNote = translateMelodyMidi(melodyCollection);
@@ -303,11 +327,11 @@ export default function Home() {
   return (
     <div className="melody">
       <div>
-        <MidiUtils instrument={instrument} />
+        
         <button
           className="menuButton"
           hidden={midiNotes.length === 0}
-          disabled={prevMelody !== midiNotes}
+          disabled={prevMelody !== midiNotes || prevMelody.length === 0 }
           onClick={() => reverseMelody()}
         >
           <Reverse />
@@ -316,7 +340,9 @@ export default function Home() {
         <button className="menuButton" onClick={handleToggleDropdowns}>
           <Edit />
         </button>
-
+        <div style={{ display: "inline-block"}}>
+        <MidiUtils instrument={instrument} />
+        </div>
         {showDropdowns && (
           <div className="menuOptions">
             <div>
@@ -340,6 +366,9 @@ export default function Home() {
             <div>
               Instrument <Instrument onChange={handleInstrumentChange} />
             </div>
+            <div>
+              Drums <Drums onChange={handleDrumsChange} />
+            </div>
           </div>
         )}
       </div>
@@ -353,6 +382,14 @@ export default function Home() {
           cycles={cycles}
         />
         <p className="melody">{notes}</p>
+        <button
+          className="round-button"
+          hidden={midiNotes.length === 0}
+          onClick={() => playNotes(midiNotes)}
+          // disabled={isButtonDisabled}
+        >
+          <Drum/>
+        </button>
         <button className="round-button" onClick={generateMelody}>
           <Shuffle />
         </button>
