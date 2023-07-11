@@ -94,6 +94,13 @@ body {
   margin-top: 10px;
 }
 
+.shape-button {
+  border-radius: 5%;
+  background-color: transparent;
+  border-color: #009458;
+  margin-top: 10px;
+}
+
 .menuButton {
   border-radius: 10%;
   width: 60px;

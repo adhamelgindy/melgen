@@ -41,6 +41,7 @@ export default function Home() {
   const [melodyCollection, setMelodyCollection] = useState([]);
   const [prevMelodyCollection, setPrevMelodyCollection] = useState([]);
   const [midiIn, setMidiIn] = useState("");
+  const [isButtonActivated, setIsButtonActivated] = useState(false);
   let melodysCollection = {
     melodies: [],
   };
@@ -155,46 +156,57 @@ export default function Home() {
   //                Player                   //
   //#########################################//
 
-  const playDrums = () => {
-    const snare = new Tone.Player("/sampler/snare/snare808.mp3").toDestination();
-    const snarePattern = new Tone.Pattern(
-      (time, note) => {
-        snare.start(time);
-      },
-      ["C1"], // Adjust the pattern to hit the snare once
-      "1n"
-    );
+  // const playDrums = () => {
+  //   const snare = new Tone.Player("/sampler/snare/snare808.mp3").toDestination();
+  //   const snarePattern = new Tone.Pattern(
+  //     (time, note) => {
+  //       snare.start(time);
+  //     },
+  //     ["C1"], // Adjust the pattern to hit the snare once
+  //     "1n"
+  //   );
 
     
   
-    // Start the drum pattern
-    Tone.ToneAudioBuffer.loaded().then(() => {
-      Tone.Transport.start();
-      snarePattern.start();
-    });
+  //   // Start the drum pattern
+  //   Tone.ToneAudioBuffer.loaded().then(() => {
+  //     Tone.Transport.start();
+  //     snarePattern.start();
+  //   });
   
-    // Stop the drum pattern after a specified duration
-    const duration = "1m"; // Adjust the duration based on your melody playback
-    Tone.Transport.scheduleOnce(() => {
-      snarePattern.stop();
-      Tone.Transport.stop();
-    }, duration);
-  };
+  //   // Stop the drum pattern after a specified duration
+  //   const duration = "1m"; // Adjust the duration based on your melody playback
+  //   Tone.Transport.scheduleOnce(() => {
+  //     snarePattern.stop();
+  //     Tone.Transport.stop();
+  //   }, duration);
+  // };
   
-  const playSnare = () => {
-    const snare = new Tone.Player("/sampler/bass/hihat.mp3").toDestination();
-    
+  const playDrums = () => {
+    if (isButtonActivated) {
+    // play another snare 0.5 sec after the release of the first one
+    const snare = new Tone.Player(`/sampler/drums/${drums}.mp3`).toDestination();
+  
     // Play the snare immediately
     Tone.ToneAudioBuffer.loaded().then(() => {
       snare.start();
     });
-    
   
     // Stop the snare after a specified duration
     const duration = "1m"; // Adjust the duration based on your desired length
     Tone.Transport.scheduleOnce(() => {
       snare.stop();
     }, duration);
+  
+    // Tone.Transport.scheduleOnce(() => {
+    //   snare.stop();
+    // }, duration + 0.5);
+    // Schedule the second snare
+    // const delay = Tone.Time("0.5s"); // Adjust the delay as needed
+    // Tone.Transport.scheduleOnce(() => {
+    //   playSnare();
+    // }, `+${delay}`);
+  }
   };
   
   
@@ -225,7 +237,7 @@ export default function Home() {
     
     for (let i = 0; i < cycles; i++) {
       //  playDrums();
-      playSnare();
+      playDrums();
       for (let j = 0; j < notes.length; j++) {
         await playNote();
         await new Promise((resolve) => setTimeout(resolve, mirrorValue(bpm)));
@@ -287,6 +299,19 @@ export default function Home() {
     setcycles(selectedCycles);
   };
 
+  const handleActivateDrumsClick = () => {
+    if(isButtonActivated === false) {
+      setIsButtonActivated(true);
+    } else {
+      setIsButtonActivated(false);
+    }
+    // playSnare();
+  };
+
+  const buttonStyle = {
+    opacity: isButtonActivated ? '100%' : '50%',
+  };
+
   // const handleMidiCheckbox = (event) => {
   //   setIsChecked(event.target.checked);
   //   location.reload();
@@ -324,6 +349,9 @@ export default function Home() {
     setShowDropdowns(!showDropdowns);
   };
 
+  
+
+
   return (
     <div className="melody">
       <div>
@@ -340,7 +368,7 @@ export default function Home() {
         <button className="menuButton" onClick={handleToggleDropdowns}>
           <Edit />
         </button>
-        <div style={{ display: "inline-block"}}>
+        <div style={{ display: "inline-block", position: "relative" ,top: "-14px"}}>
         <MidiUtils instrument={instrument} />
         </div>
         {showDropdowns && (
@@ -383,11 +411,12 @@ export default function Home() {
         />
         <p className="melody">{notes}</p>
         <button
-          className="round-button"
-          hidden={midiNotes.length === 0}
-          onClick={() => playNotes(midiNotes)}
-          // disabled={isButtonDisabled}
-        >
+      className="round-button"
+      style = {buttonStyle}
+      hidden={midiNotes.length === 0}
+      onClick={handleActivateDrumsClick}
+      // disabled={!isButtonActivated}
+    >
           <Drum/>
         </button>
         <button className="round-button" onClick={generateMelody}>

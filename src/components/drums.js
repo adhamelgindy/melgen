@@ -16,7 +16,7 @@ export default function Drums({ onChange }) {
         <option value="bass">Bass</option>
         <option value="hihat">Hihat</option>
         <option value="kick">Kick</option>
-        <option value="snare">Snare</option>
+        <option value="snare808">Snare</option>
       </select>
     </div>
      </div>

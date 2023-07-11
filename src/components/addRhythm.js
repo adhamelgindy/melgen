@@ -9,13 +9,20 @@ function addrhythm(melody, genre) {
 
   // Add empty elements based on the genre
   switch (genre) {
+    // case "pop":
+    //   const popPositions = [2, 4, 5, 7, 9];
+    //   for (let i = 0; i < emptyElementsCount; i++) {
+    //     const randomIndex = popPositions[Math.floor(Math.random() * popPositions.length)];
+    //     rhythmicMelody.splice(randomIndex, 0, "");
+    //   }
+    //   break;
     case "pop":
-      const popPositions = [2, 4, 5, 7, 9];
-      for (let i = 0; i < emptyElementsCount; i++) {
-        const randomIndex = popPositions[Math.floor(Math.random() * popPositions.length)];
-        rhythmicMelody.splice(randomIndex, 0, "");
-      }
-      break;
+  const popPositions = [2, 4, 5, 7, 9];
+  for (let i = 0; i < emptyElementsCount && i < popPositions.length; i++) {
+    const position = popPositions[i];
+    rhythmicMelody.splice(position, 0, "");
+  }
+  break;
     case "jazz":
       // Add specific positions for jazz genre
       const jazzPositions = [2, 4, 7, 9];
