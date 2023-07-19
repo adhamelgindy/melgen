@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import connectMidi from "./connectMidi";
 
 const Dropdown = ({ options, onChange }) => {
@@ -31,11 +31,11 @@ const MidiUtils = (instrument) => {
   useEffect(() => {
     // Initialize MIDI devices
     navigator.requestMIDIAccess().then(midiReady);
-    
+
     // Cleanup function
     return () => {
       if (midi) {
-        midi.removeEventListener('statechange', midiStateChangeHandler);
+        midi.removeEventListener("statechange", midiStateChangeHandler);
       }
     };
   }, []);
@@ -44,10 +44,10 @@ const MidiUtils = (instrument) => {
 
   function midiReady(midiAccess) {
     midi = midiAccess;
-    midi.addEventListener('statechange', midiStateChangeHandler);
+    midi.addEventListener("statechange", midiStateChangeHandler);
     initDevices(midi);
     // let midiInput = Array.from(midi.inputs.values());
-     connectMidi(instrument, midiInDevice, midiOutDevice);
+    connectMidi(instrument, midiInDevice, midiOutDevice);
     //  connectMidiOut(midiOutDevice)
     // Call connectMidi with the desired instrument
   }
@@ -58,34 +58,23 @@ const MidiUtils = (instrument) => {
 
   function initDevices(midi) {
     const inputs = Array.from(midi.inputs.values());
-    console.log('inputs', inputs);
     const outputs = Array.from(midi.outputs.values());
-    console.log('outputs', outputs);
-    // const inputDeviceNames = inputs.map((device) => device.name);
-    const defaultDeviceName = inputs.length > 0 ? inputs[0].name : 'No default device available';
-    console.log('defaultDeviceName', defaultDeviceName);
-    if (!midiInDevice){   
+    const defaultDeviceName =
+      inputs.length > 0 ? inputs[0].name : "No default device available";
+    if (!midiInDevice) {
       setMidiInDevice(findMIDIDeviceByName(inputs, defaultDeviceName));
     }
     if (midiOutDevice.length === 0) {
-      console.log('midiOutDevice1111111', midiOutDevice);
-      setMidiOutDevice(findMIDIDeviceByName(outputs, defaultDeviceName))
-      console.log('midiOutDevice22222222', midiOutDevice);
+      setMidiOutDevice(findMIDIDeviceByName(outputs, defaultDeviceName));
     }
 
-
-    setMidiIn(inputs.map((device) =>  device.name));
-    // console.log('???????midiIn', midiIn);
-    // console.log('device>?????????', midiInDevice);
-    
+    setMidiIn(inputs.map((device) => device.name));
     setMidiOut(outputs.map((device) => device.name));
-    // console.log('???????midiout', midiOut);
-    // console.log('device>?????????', midiOutDevice);
-    setMidiIntial(midi)
+    setMidiIntial(midi);
   }
 
   function findMIDIDeviceByName(devices, name) {
-    console.log('');
+    console.log("");
     for (let i = 0; i < devices.length; i++) {
       if (devices[i].name === name) {
         return devices[i];
@@ -95,68 +84,51 @@ const MidiUtils = (instrument) => {
   }
 
   const handleInputSelectChange = (e) => {
-   // disconnect last midi on change ??????????????????????????????????????
+    // disconnect last midi on change ??????????????????????????????????????
     const selectedDevice = e.target.value;
 
     const inputs = Array.from(midiIntial.inputs.values());
-    console.log('inputs', inputs);
-    console.log('selectedDevice', selectedDevice);
+    console.log("inputs", inputs);
+    console.log("selectedDevice", selectedDevice);
     // console.log('findMIDIDeviceByName(inputs, selectedDevice)', findMIDIDeviceByName(inputs, selectedDevice));
-const device = findMIDIDeviceByName(inputs, selectedDevice);
-    // findMIDIDeviceByName(inputs, selectedDevice);
+    const device = findMIDIDeviceByName(inputs, selectedDevice);
     setMidiInDevice(device);
-    console.log('instrument', instrument);
-    connectMidi(instrument, device, midiOutDevice)
-    console.log('setMidiInDevicceececee', midiInDevice);
+    console.log("instrument", instrument);
+    connectMidi(instrument, device, midiOutDevice);
+    console.log("setMidiInDevicceececee", midiInDevice);
   };
-  
-  
 
   const handleOutputSelectChange = (e) => {
-    const selectedDevice = e.target.value; 
-  
+    const selectedDevice = e.target.value;
+
     const outputs = Array.from(midiIntial.outputs.values());
     const device = findMIDIDeviceByName(outputs, selectedDevice);
     setMidiOutDevice(device);
-    connectMidi(instrument, midiInDevice, device)
-    
+    connectMidi(instrument, midiInDevice, device);
   };
-
-  function connectMidiOut(device) {
-    // Open the MIDI output port
-    device.open()
-      .then(() => {
-        // MIDI output is now connected, you can send MIDI messages
-        console.log('MIDI output connected:', device.name);
-      })
-      .catch((error) => {
-        // Handle any errors that occur during MIDI output connection
-        console.error('Failed to connect MIDI output:', error);
-      });
-  };
-  
 
   const handleToggleDropdowns = () => {
     setShowDropdowns(!showDropdowns);
   };
 
   return (
-    <div style={{ color: '#009458' }}>
-  <button className="menuButton" onClick={handleToggleDropdowns} style={{ color: '#009458' }}>
-    Midi
-  </button>
-  {showDropdowns && (
-    <div  style={{ display: 'grid'}}>
-      <label>Input: </label>
-      <Dropdown options={midiIn} onChange={handleInputSelectChange} />
-      <label>Output: </label>
-      <Dropdown options={midiOut} onChange={handleOutputSelectChange} />
+    <div style={{ color: "#009458" }}>
+      <button
+        className="menuButton"
+        onClick={handleToggleDropdowns}
+        style={{ color: "#009458" }}
+      >
+        Midi
+      </button>
+      {showDropdowns && (
+        <div style={{ display: "grid" }}>
+          <label>Input: </label>
+          <Dropdown options={midiIn} onChange={handleInputSelectChange} />
+          <label>Output: </label>
+          <Dropdown options={midiOut} onChange={handleOutputSelectChange} />
+        </div>
+      )}
     </div>
-  )}
-  {/* <Button onClick={copyToClipboard}>Copy</Button> */}
-</div>
-
-  
   );
 };
 

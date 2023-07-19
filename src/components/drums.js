@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 export default function Drums({ onChange }) {
-  const [drums, setDrums] = useState('hihat');
+  const [drums, setDrums] = useState('kick');
 
   function handleDrumsChange(event) {
     const selectedDrums = event.target.value;
     setDrums(selectedDrums);
-    onChange(selectedDrums); // Call the onChange prop with the selected value
+    onChange(selectedDrums);
   }
 
   return (

@@ -14,13 +14,13 @@ export default function Genre({ onChange }) {
       <div className="dropdown">
         <select id="number-dropdown" className="rootNote" value={genre} onChange={handleGenreChange} >
           <option value="classic">Classic</option>
-          <option value="latin">Latin</option>
+          <option value="hiphop">Hiphop</option>
+          <option value="electronic">Electronic</option>
+          {/* <option value="latin">Latin</option>
           <option value="jazz">Jazz</option>
           <option value="pop">Pop</option>
-          <option value="funk">Funk</option>
-          <option value="hiphop">Hiphop</option>
-          <option value="rock">Rock</option>
-          <option value="electronic">Electronic</option>
+          <option value="funk">Funk</option> */}
+          {/* <option value="rock">Rock</option> */}
         </select>
       </div>
     </div>
