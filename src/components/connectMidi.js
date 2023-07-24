@@ -16,7 +16,11 @@ async function connectMidi(instrument, midiInput, midiOutput) {
     if (e.data[0] === 144 && e.data[2] !== 0) {
       const frequency = Tone.Midi(e.data[1]).toFrequency();
       // console.log("frequency", frequency, "css");
-      console.log("%c frequency", frequency, 'color: blue;font-size: 16px;font-weight: bold');
+      // console.log( frequency, 'color: blue;font-size: 16px;font-weight: bold');
+
+      
+const style = 'color: green; font-size: 16px; font-weight: bold;';
+console.log('%c' + frequency, style);
 
       synth.triggerAttackRelease(frequency, "4n");
 

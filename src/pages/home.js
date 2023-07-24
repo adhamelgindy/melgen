@@ -310,7 +310,7 @@ export default function Home() {
               Scale <Scale onChange={handleScaleChange} />
             </div>
             <div>
-              Genre <Genre onChange={handleGenreChange} />
+              Root <RootNote onChange={handleRootNoteChange} />
             </div>
             <div>
               Octave <Octave onChange={handleOctaveChange} />
@@ -319,16 +319,16 @@ export default function Home() {
               Length <MelodyLength onChange={handleMelodyLengthChange} />
             </div>
             <div>
-              Root <RootNote onChange={handleRootNoteChange} />
-            </div>
-            <div>
-              Cycles <Cycles onChange={handleCyclesChange} />
-            </div>
-            <div>
               Instrument <Instrument onChange={handleInstrumentChange} />
             </div>
             <div>
+              Genre <Genre onChange={handleGenreChange} />
+            </div>
+            <div>
               Drums <Drums onChange={handleDrumsChange} />
+            </div>
+            <div>
+              Repeatition <Cycles onChange={handleCyclesChange} />
             </div>
           </div>
         )}
